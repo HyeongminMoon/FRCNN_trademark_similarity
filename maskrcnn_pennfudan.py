@@ -25,6 +25,11 @@ from engine import train_one_epoch, evaluate
 import utils
 import transforms as T
 
+"""
+data에는 __getitem__과 __len__이 있어야 함.
+__getitem__은 image, target을 반환해야 함.
+__len__은 이미지의 길이를 반환.
+"""
 class PennFudanDataset(torch.utils.data.Dataset):
 
     def __init__(self, root, transforms=None):
@@ -112,12 +117,10 @@ if __name__ == '__main__':
     # set data
     dataset = PennFudanDataset('PennFudanPed', get_transform(train=True))
     dataset_test = PennFudanDataset('PennFudanPed', get_transform(train=False))
-
     torch.manual_seed(1)
     indices = torch.randperm(len(dataset)).tolist()
     dataset = torch.utils.data.Subset(dataset, indices[:-50])
     dataset_test = torch.utils.data.Subset(dataset_test, indices[-50:])
-
     # can error: try num_workers=0
     data_loader = torch.utils.data.DataLoader(
         dataset, batch_size=1, shuffle=True, num_workers=4, collate_fn=utils.collate_fn
@@ -136,7 +139,7 @@ if __name__ == '__main__':
         device = torch.device('cpu')
 
     #define classes
-    num_classes = 2
+    num_classes = 100
     labels = ['background','person']
     # load model. if none, train.
     if (os.path.isfile('./model.pt')):
@@ -160,7 +163,7 @@ if __name__ == '__main__':
     torch.save(model, './model.pt')
 
     # test
-    img, _ = dataset_test[12]
+    img, _ = dataset_test[15]
     model.eval()
     with torch.no_grad():
         prediction = model([img.to(device)])
