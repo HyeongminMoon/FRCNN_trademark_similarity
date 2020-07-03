@@ -134,8 +134,10 @@ if __name__ == '__main__':
         device = torch.device('cuda')
     else:
         device = torch.device('cpu')
-    num_classes = 2
 
+    #define classes
+    num_classes = 2
+    labels = ['background','person']
     # load model. if none, train.
     if (os.path.isfile('./model.pt')):
         model = torch.load('./model.pt', map_location=device)
@@ -147,7 +149,7 @@ if __name__ == '__main__':
         optimizer = torch.optim.SGD(params, lr=0.005, momentum=0.9, weight_decay=0.0005)
         lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
-        num_epochs = 1
+        num_epochs = 10
 
         for epoch in range(num_epochs):
             train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=10)
@@ -158,23 +160,36 @@ if __name__ == '__main__':
     torch.save(model, './model.pt')
 
     # test
-    img, _ = dataset_test[0]
+    img, _ = dataset_test[12]
     model.eval()
     with torch.no_grad():
         prediction = model([img.to(device)])
-    im1 = Image.fromarray(img.mul(255).permute(1, 2, 0).byte().numpy())
-    im2 = Image.fromarray(prediction[0]['masks'][0, 0].mul(255).byte().cpu().numpy())
 
-    # draw bounding boxes
+    im1 = Image.fromarray(img.mul(200).permute(1, 2, 0).byte().numpy())
+
+    # draw bounding boxes & mask layer & label
     num_boxes = len(prediction[0]['boxes'])
     colors = pkl.load(open("pallete","rb"))
     im1_ = ImageDraw.Draw(im1)
+    print(prediction[0]['boxes'])
     for i in range(num_boxes):
-        c0 = prediction[0]['boxes'][i].byte().cpu().numpy()
+        c0 = prediction[0]['boxes'][i].cpu().numpy()
+        print(c0)
         c1 = tuple(c0[:2])
         c2 = tuple(c0[2:])
+        im2 = Image.fromarray(prediction[0]['masks'][i, 0].mul(205).byte().cpu().numpy())
         color = random.choice(colors)
+        layer = Image.new('RGB', im2.size, color)
+        #bounding box
         im1_.rectangle((c1, c2), outline=color)
+        #label
+        str_ = labels[prediction[0]['labels'][i].cpu().numpy()]
+        score_ = prediction[0]['scores'][i].cpu().numpy()
+        score = np.round(score_,4)
+        im1_.text(c1, str_+" score:"+ str(score),fill=(255,255,255,255))
+        #mask layer
+        im1.paste(layer, (0,0), im2)
+
 
     fp1 = open('im1.jpg','w')
     im1.save(fp1,"JPEG")
