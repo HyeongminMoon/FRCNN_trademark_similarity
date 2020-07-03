@@ -8,12 +8,15 @@ import torchvision
 from torchvision import datasets, transforms
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
+import pickle as pkl
+import random
+import cv2
 
 from IPython.display import Image
 from IPython import display
 import matplotlib.pyplot as plt
 
-from PIL import Image
+from PIL import Image, ImageDraw
 import os
 import numpy as np
 
@@ -105,7 +108,8 @@ if __name__ == '__main__':
     # test_PFD = PennFudanDataset('PennFudanPed')
     # test_PFD.__getitem__(0)
 
-    # learning
+
+    # set data
     dataset = PennFudanDataset('PennFudanPed', get_transform(train=True))
     dataset_test = PennFudanDataset('PennFudanPed', get_transform(train=False))
 
@@ -132,28 +136,45 @@ if __name__ == '__main__':
         device = torch.device('cpu')
     num_classes = 2
 
-    model = get_instance_segmentation_model(num_classes)
-    model.to(device)
+    # load model. if none, train.
+    if (os.path.isfile('./model.pt')):
+        model = torch.load('./model.pt', map_location=device)
+    else:
+        model = get_instance_segmentation_model(num_classes)
+        model.to(device)
 
-    params = [p for p in model.parameters() if p.requires_grad]
-    optimizer = torch.optim.SGD(params, lr=0.005, momentum=0.9, weight_decay=0.0005)
-    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
+        params = [p for p in model.parameters() if p.requires_grad]
+        optimizer = torch.optim.SGD(params, lr=0.005, momentum=0.9, weight_decay=0.0005)
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
-    num_epochs = 10
+        num_epochs = 1
 
-    for epoch in range(num_epochs):
-        train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=10)
-        lr_scheduler.step()
-        evaluate(model, data_loader_test, device=device)
+        for epoch in range(num_epochs):
+            train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=10)
+            lr_scheduler.step()
+            evaluate(model, data_loader_test, device=device)
+
+    # save
+    torch.save(model, './model.pt')
 
     # test
     img, _ = dataset_test[0]
     model.eval()
     with torch.no_grad():
         prediction = model([img.to(device)])
-"""    print(prediction)
     im1 = Image.fromarray(img.mul(255).permute(1, 2, 0).byte().numpy())
     im2 = Image.fromarray(prediction[0]['masks'][0, 0].mul(255).byte().cpu().numpy())
+
+    # draw bounding boxes
+    num_boxes = len(prediction[0]['boxes'])
+    colors = pkl.load(open("pallete","rb"))
+    im1_ = ImageDraw.Draw(im1)
+    for i in range(num_boxes):
+        c0 = prediction[0]['boxes'][i].byte().cpu().numpy()
+        c1 = tuple(c0[:2])
+        c2 = tuple(c0[2:])
+        color = random.choice(colors)
+        im1_.rectangle((c1, c2), outline=color)
 
     fp1 = open('im1.jpg','w')
     im1.save(fp1,"JPEG")
@@ -162,4 +183,3 @@ if __name__ == '__main__':
     im2.save(fp2,"JPEG")
     fp1.close()
     fp2.close()
-"""
