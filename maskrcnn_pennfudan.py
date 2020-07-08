@@ -11,14 +11,18 @@ from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 import pickle as pkl
 import random
 import cv2
+import json
+import skimage.draw
 
-from IPython.display import Image
+
+#from IPython.display import Image
 from IPython import display
 import matplotlib.pyplot as plt
 
 from PIL import Image, ImageDraw
 import os
 import numpy as np
+import sys
 
 #copied from torchvision
 from engine import train_one_epoch, evaluate
@@ -30,7 +34,7 @@ data에는 __getitem__과 __len__이 있어야 함.
 __getitem__은 image, target을 반환해야 함.
 __len__은 이미지의 길이를 반환.
 """
-class PennFudanDataset(torch.utils.data.Dataset):
+class BallonDataset(torch.utils.data.Dataset):
 
     def __init__(self, root, transforms=None):
         self.root = root
@@ -38,6 +42,7 @@ class PennFudanDataset(torch.utils.data.Dataset):
         # Load images, sorting them
         self.imgs = list(sorted(os.listdir(os.path.join(root, "PNGImages"))))
         self.masks = list(sorted(os.listdir(os.path.join(root, "PedMasks"))))
+
 
     def __getitem__(self, idx):
         img_path = os.path.join(self.root, "PNGImages", self.imgs[idx])
@@ -47,6 +52,7 @@ class PennFudanDataset(torch.utils.data.Dataset):
         mask = Image.open(mask_path)
 
         mask = np.array(mask)
+        np.set_printoptions(threshold=sys.maxsize)
 
         obj_ids = np.unique(mask)
         obj_ids = obj_ids[1:]
@@ -88,6 +94,102 @@ class PennFudanDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.imgs)
 
+class PennFudanDataset(torch.utils.data.Dataset):
+
+    def __init__(self, root, transforms=None):
+        self.root = root
+        self.transforms = transforms
+        # Load images, sorting them
+        self.imgs = list(sorted(os.listdir(os.path.join(root, "PNGImages"))))
+        self.masks = list(sorted(os.listdir(os.path.join(root, "PedMasks"))))
+
+    def __getitem__(self, idx):
+        img_path = os.path.join(self.root, "PNGImages", self.imgs[idx])
+        mask_path = os.path.join(self.root, "PedMasks", self.masks[idx])
+        img = Image.open(img_path).convert("RGB")
+
+        mask = Image.open(mask_path)
+
+        mask = np.array(mask)
+        np.set_printoptions(threshold=sys.maxsize)
+
+        obj_ids = np.unique(mask)
+        obj_ids = obj_ids[1:]
+
+        masks = mask == obj_ids[:, None, None]
+
+        num_objs = len(obj_ids)
+        boxes = []
+        for i in range(num_objs):
+            pos = np.where(masks[i])
+            xmin = np.min(pos[1])
+            xmax = np.max(pos[1])
+            ymin = np.min(pos[0])
+            ymax = np.max(pos[0])
+            boxes.append([xmin,ymin,xmax,ymax])
+
+        boxes = torch.as_tensor(boxes, dtype=torch.float32)
+        labels = torch.ones((num_objs,),dtype=torch.int64)
+        masks = torch.as_tensor(masks, dtype=torch.uint8)
+
+        image_id = torch.tensor([idx])
+        area = (boxes[:,3] - boxes[:,1]) * (boxes[:,2] - boxes[:,0])
+        iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
+
+        target = {}
+        target["boxes"] = boxes
+        target["labels"] = labels
+        target["masks"] = masks
+        target["image_id"] = image_id
+        target["area"] = area
+        target["iscrowd"] = iscrowd
+        #print(img)
+        #print(target)
+        if self.transforms is not None:
+            img, target = self.transforms(img, target)
+
+        return img, target
+
+    def __len__(self):
+        return len(self.imgs)
+
+def get_mask_from_json(json_path):
+    fp = open(json_path,'r')
+    json_data = json.load(fp)
+    fp.close()
+    for key in json_data.keys():
+        # get information
+        file_data = json_data[key]
+        img_name = file_data['filename']
+        img_size = file_data['size']
+        mask_regions = file_data['regions']
+        if len(mask_regions) == 0: continue
+        region_points = mask_regions[0]['shape_attributes']
+        all_points_x = region_points['all_points_x']
+        all_points_y = region_points['all_points_y']
+        img = Image.open('../balloon/train/'+img_name)
+
+        # draw mask
+        mask = np.zeros((img.size[1],img.size[0]))
+        rr, cc = skimage.draw.polygon(all_points_y,all_points_x)
+        mask[rr,cc] = 1
+        # save mask
+        img2 = Image.fromarray(mask)
+        if img2.mode != 'RGB':
+            img2 = img2.convert('RGB')
+        fp2 = open('test.jpg', 'w')
+        img2.save(fp2, "JPEG")
+        fp2.close()
+
+    #img_size = ???
+    #point x,y = ???
+    img_size = 100
+    mask = np.zeros(img_size)
+
+
+    return mask
+
+
 def get_instance_segmentation_model(num_classes):
     model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=True)
     #Region Of Interest
@@ -108,7 +210,7 @@ def get_transform(train):
         transforms.append(T.RandomHorizontalFlip(0.5))
     return T.Compose(transforms)
 
-if __name__ == '__main__':
+def temp():
     # simple check for dataset
     # test_PFD = PennFudanDataset('PennFudanPed')
     # test_PFD.__getitem__(0)
@@ -174,10 +276,8 @@ if __name__ == '__main__':
     num_boxes = len(prediction[0]['boxes'])
     colors = pkl.load(open("pallete","rb"))
     im1_ = ImageDraw.Draw(im1)
-    print(prediction[0]['boxes'])
     for i in range(num_boxes):
         c0 = prediction[0]['boxes'][i].cpu().numpy()
-        print(c0)
         c1 = tuple(c0[:2])
         c2 = tuple(c0[2:])
         im2 = Image.fromarray(prediction[0]['masks'][i, 0].mul(205).byte().cpu().numpy())
@@ -201,3 +301,7 @@ if __name__ == '__main__':
     im2.save(fp2,"JPEG")
     fp1.close()
     fp2.close()
+
+if __name__ == '__main__':
+    #temp()
+    json_data = get_mask_from_json('../balloon/train/via_project_8Jul2020_11h59m_json.json')
