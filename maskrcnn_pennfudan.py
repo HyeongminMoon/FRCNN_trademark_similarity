@@ -10,7 +10,6 @@ from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 import pickle as pkl
 import random
-import cv2
 import json
 import skimage.draw
 
