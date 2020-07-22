@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import torchvision
-from torchvision import datasets, transforms
+from torchvision import datasets
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 import pickle as pkl
@@ -26,7 +26,7 @@ import sys
 #copied from torchvision
 from engine import train_one_epoch, evaluate
 import utils
-import transforms as T
+from torchvision import transforms as T
 
 """
 data에는 __getitem__과 __len__이 있어야 함.
@@ -84,7 +84,7 @@ class ViennaDataset(torch.utils.data.Dataset):
         #print(img)
         #print(target)
         if self.transforms is not None:
-            img, target = self.transforms(img, target)
+            img = self.transforms(img)
 
         return img, target
 
@@ -108,11 +108,9 @@ class PennFudanDataset(torch.utils.data.Dataset):
         mask = Image.open(mask_path)
 
         mask = np.array(mask)
-        print(mask)
         np.set_printoptions(threshold=sys.maxsize)
 
         obj_ids = np.unique(mask)
-        print(obj_ids)
         obj_ids = obj_ids[1:]
 
         masks = mask == obj_ids[:, None, None]
@@ -206,9 +204,9 @@ def get_instance_segmentation_model(num_classes):
 def get_transform(train):
     transforms = []
     #T should be changed
-    transforms.append(T.ToTensor())
     if train:
         transforms.append(T.RandomHorizontalFlip(0.5))
+    transforms.append(T.ToTensor())
     return T.Compose(transforms)
 
 def change_name(path,num):
@@ -321,8 +319,6 @@ def temp():
             # mask layer
             im1.paste(layer, (0, 0), im2)
 
-        print(i)
-        print(str(i))
         fp1 = open('results/'+str(i)+'_detection.jpg', 'w')
         im1.save(fp1, "JPEG")
 
