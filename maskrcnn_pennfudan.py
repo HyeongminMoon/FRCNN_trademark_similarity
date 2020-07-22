@@ -1,5 +1,4 @@
 #written by mohomin123@gmail.com
-import itertools
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -12,11 +11,6 @@ import pickle as pkl
 import random
 import json
 import skimage.draw
-
-
-#from IPython.display import Image
-from IPython import display
-import matplotlib.pyplot as plt
 
 from PIL import Image, ImageDraw
 import os
@@ -205,7 +199,8 @@ def get_transform(train):
     transforms = []
     #T should be changed
     if train:
-        transforms.append(T.RandomHorizontalFlip(0.5))
+        transforms.append(T.ColorJitter())
+    #randomaffine,randomgrayscale,randomerasing
     transforms.append(T.ToTensor())
     return T.Compose(transforms)
 
@@ -232,7 +227,7 @@ def temp():
     dataset_test = torch.utils.data.Subset(dataset_test, indices[-50:])
     # can error: try num_workers=0
     data_loader = torch.utils.data.DataLoader(
-        dataset, batch_size=2, shuffle=True, num_workers=4, collate_fn=utils.collate_fn
+        dataset, batch_size=1, shuffle=True, num_workers=4, collate_fn=utils.collate_fn
     )
     data_loader_test = torch.utils.data.DataLoader(
         dataset_test, batch_size=1, shuffle=False, num_workers=4, collate_fn=utils.collate_fn
@@ -275,7 +270,7 @@ def temp():
         optimizer = torch.optim.SGD(params, lr=0.005, momentum=0.9, weight_decay=0.0005)
         lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
-        num_epochs = 20
+        num_epochs = 10
 
         for epoch in range(num_epochs):
             train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=10)
@@ -301,7 +296,7 @@ def temp():
         colors = pkl.load(open("pallete", "rb"))
         im1_ = ImageDraw.Draw(im1)
         for j in range(num_boxes):
-            if prediction[0]['scores'][j].cpu().numpy() < 0.7 :
+            if prediction[0]['scores'][j].cpu().numpy() < 0.6 :
                 continue
             c0 = prediction[0]['boxes'][j].cpu().numpy()
             c1 = tuple(c0[:2])
