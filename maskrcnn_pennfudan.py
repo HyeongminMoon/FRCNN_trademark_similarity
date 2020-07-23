@@ -199,9 +199,12 @@ def get_transform(train):
     transforms = []
     #T should be changed
     if train:
-        transforms.append(T.ColorJitter())
+        transforms.append(T.Grayscale(3))
+        transforms.append(T.ToTensor())
+        transforms.append(T.RandomErasing())
+    else:
+        transforms.append(T.ToTensor())
     #randomaffine,randomgrayscale,randomerasing
-    transforms.append(T.ToTensor())
     return T.Compose(transforms)
 
 def change_name(path,num):
