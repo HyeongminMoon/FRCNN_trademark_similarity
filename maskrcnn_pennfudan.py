@@ -41,14 +41,14 @@ class ViennaDataset(torch.utils.data.Dataset):
         img_path = os.path.join(self.root, "crown_woman/images", self.imgs[idx])
         mask_path = os.path.join(self.root, "crown_woman/mask", self.masks[idx])
         img = Image.open(img_path).convert("RGB")
-
         mask = Image.open(mask_path).convert("L")
         mask = np.array(mask)
         np.set_printoptions(threshold=sys.maxsize)
-
         obj_ids = np.unique(mask)
-        obj_ids = obj_ids[1:]
-
+        if len(obj_ids) > 2:
+            obj_ids = obj_ids[1:-1]
+        else:
+            obj_ids = obj_ids[1:]
         masks = mask == obj_ids[:, None, None]
         num_objs = len(obj_ids)
         boxes = []
@@ -85,6 +85,7 @@ class ViennaDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.imgs)
 
+#for test. no more used.
 class PennFudanDataset(torch.utils.data.Dataset):
 
     def __init__(self, root, transforms=None):
@@ -157,15 +158,15 @@ def save_mask_from_json(json_path,img_path,save_path):
         img_size = file_data['size']
         mask_regions = file_data['regions']
         if len(mask_regions) == 0: continue
-        region_points = mask_regions[0]['shape_attributes']
-        all_points_x = region_points['all_points_x']
-        all_points_y = region_points['all_points_y']
+        #draw masks
         img = Image.open(img_path+img_name)
-
-        # draw mask
         mask = np.zeros((img.size[1],img.size[0]))
-        rr, cc = skimage.draw.polygon(all_points_y,all_points_x)
-        mask[rr,cc] = 1
+        for i in range(len(mask_regions)):
+            region_points = mask_regions[i]['shape_attributes']
+            all_points_x = region_points['all_points_x']
+            all_points_y = region_points['all_points_y']
+            rr, cc = skimage.draw.polygon(all_points_y,all_points_x)
+            mask[rr,cc] = i+1
         # save mask
         img2 = Image.fromarray(mask)
         if img2.mode != 'RGB':
