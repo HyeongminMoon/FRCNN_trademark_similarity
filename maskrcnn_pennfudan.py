@@ -33,13 +33,13 @@ class ViennaDataset(torch.utils.data.Dataset):
         self.root = root
         self.transforms = transforms
         # Load images, sorting them
-        self.imgs = list(sorted(os.listdir(os.path.join(root, "crown_woman/images"))))
-        self.masks = list(sorted(os.listdir(os.path.join(root, "crown_woman/mask"))))
+        self.imgs = list(sorted(os.listdir(os.path.join(root, "00/images"))))
+        self.masks = list(sorted(os.listdir(os.path.join(root, "00/mask"))))
 
 
     def __getitem__(self, idx):
-        img_path = os.path.join(self.root, "crown_woman/images", self.imgs[idx])
-        mask_path = os.path.join(self.root, "crown_woman/mask", self.masks[idx])
+        img_path = os.path.join(self.root, "00/images", self.imgs[idx])
+        mask_path = os.path.join(self.root, "00/mask", self.masks[idx])
         
         #img_path = os.path.join(self.root, "crown_woman/images/2big_img_105.jpg")
         #mask_path = os.path.join(self.root, "crown_woman/mask/21big_img_105_mask.png")
@@ -64,7 +64,6 @@ class ViennaDataset(torch.utils.data.Dataset):
             ymax = np.max(pos[0])
             boxes.append([xmin,ymin,xmax,ymax])
         
-        print(boxes)
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
         labels = torch.full((num_objs,), int(self.imgs[idx][0]), dtype=torch.int64)
         masks = torch.as_tensor(masks, dtype=torch.uint8)
@@ -283,7 +282,7 @@ def temp():
         optimizer = torch.optim.SGD(params, lr=0.005, momentum=0.9, weight_decay=0.0005)
         lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
-        num_epochs = 10
+        num_epochs = 12
 
         for epoch in range(num_epochs):
             train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=10)
