@@ -40,15 +40,19 @@ class ViennaDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         img_path = os.path.join(self.root, "crown_woman/images", self.imgs[idx])
         mask_path = os.path.join(self.root, "crown_woman/mask", self.masks[idx])
+        
+        #img_path = os.path.join(self.root, "crown_woman/images/2big_img_105.jpg")
+        #mask_path = os.path.join(self.root, "crown_woman/mask/21big_img_105_mask.png")
+
+        
         img = Image.open(img_path).convert("RGB")
         mask = Image.open(mask_path).convert("L")
         mask = np.array(mask)
+
         np.set_printoptions(threshold=sys.maxsize)
         obj_ids = np.unique(mask)
-        if len(obj_ids) > 2:
-            obj_ids = obj_ids[1:-1]
-        else:
-            obj_ids = obj_ids[1:]
+        #print(obj_ids)
+        obj_ids = obj_ids[1:]
         masks = mask == obj_ids[:, None, None]
         num_objs = len(obj_ids)
         boxes = []
@@ -59,7 +63,8 @@ class ViennaDataset(torch.utils.data.Dataset):
             ymin = np.min(pos[0])
             ymax = np.max(pos[0])
             boxes.append([xmin,ymin,xmax,ymax])
-
+        
+        print(boxes)
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
         labels = torch.full((num_objs,), int(self.imgs[idx][0]), dtype=torch.int64)
         masks = torch.as_tensor(masks, dtype=torch.uint8)
@@ -168,12 +173,16 @@ def save_mask_from_json(json_path,img_path,save_path):
             rr, cc = skimage.draw.polygon(all_points_y,all_points_x)
             mask[rr,cc] = i+1
         # save mask
-        img2 = Image.fromarray(mask)
-        if img2.mode != 'RGB':
-            img2 = img2.convert('RGB')
-        fp2 = open(save_path+img_name.replace('.jpg','_mask.jpg'), 'w')
-        img2.save(fp2, "JPEG")
-        fp2.close()
+        
+        #img2 = Image.fromarray(mask)
+        #if img2.mode != 'RGB':
+        #    img2 = img2.convert('RGB')
+        #fp2 = open(save_path+img_name.replace('.jpg','_mask.jpg'), 'w')
+        #img2.save(fp2, "JPEG")
+        #fp2.close()
+
+        png_img = png.from_array(mask, mode="L;16")
+        png_img.save(save_path+img_name.replace('.jpg', '_mask.png'))
 
     #img_size = ???
     #point x,y = ???
