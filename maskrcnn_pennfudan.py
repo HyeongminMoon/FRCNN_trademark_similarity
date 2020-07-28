@@ -34,12 +34,12 @@ class ViennaDataset(torch.utils.data.Dataset):
         self.transforms = transforms
         # Load images, sorting them
         self.imgs = list(sorted(os.listdir(os.path.join(root, "00/images"))))
-        self.masks = list(sorted(os.listdir(os.path.join(root, "00/mask"))))
+        #self.masks = list(sorted(os.listdir(os.path.join(root, "00/mask"))))
 
 
     def __getitem__(self, idx):
         img_path = os.path.join(self.root, "00/images", self.imgs[idx])
-        mask_path = os.path.join(self.root, "00/mask", self.masks[idx])
+        mask_path = os.path.join(self.root, "00/mask", self.imgs[idx].replace(".jpg","_mask.png"))
         
         #img_path = os.path.join(self.root, "crown_woman/images/2big_img_105.jpg")
         #mask_path = os.path.join(self.root, "crown_woman/mask/21big_img_105_mask.png")
@@ -65,6 +65,13 @@ class ViennaDataset(torch.utils.data.Dataset):
             boxes.append([xmin,ymin,xmax,ymax])
         
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
+        #if int(self.imgs[idx][0]) is 4:
+        #    labels = torch.full((num_objs,), 1, dtype=torch.int64)
+        #elif int(self.imgs[idx][0]) is 5:
+        #    labels = torch.full((num_objs,), 1, dtype=torch.int64)
+        #elif int(self.imgs[idx][0]) is 6:
+        #    labels = torch.full((num_objs,), 4, dtype=torch.int64)
+        #else:
         labels = torch.full((num_objs,), int(self.imgs[idx][0]), dtype=torch.int64)
         masks = torch.as_tensor(masks, dtype=torch.uint8)
 
@@ -235,8 +242,8 @@ def temp():
     #dataset_test = PennFudanDataset('PennFudanPed', get_transform(train=False))
     torch.manual_seed(1)
     indices = torch.randperm(len(dataset)).tolist()
-    dataset = torch.utils.data.Subset(dataset, indices[:-50])
-    dataset_test = torch.utils.data.Subset(dataset_test, indices[-50:])
+    dataset = torch.utils.data.Subset(dataset, indices[:])
+    dataset_test = torch.utils.data.Subset(dataset_test, indices[-100:])
     # can error: try num_workers=0
     data_loader = torch.utils.data.DataLoader(
         dataset, batch_size=1, shuffle=True, num_workers=4, collate_fn=utils.collate_fn
@@ -255,8 +262,8 @@ def temp():
         device = torch.device('cpu')
 
     #define classes
-    num_classes = 3
-    labels = ['background','woman','crown']
+    num_classes = 7
+    labels = ['background','woman','crown','star','man','child','jewel']
     # load model. if none, train.
     if (os.path.isfile(root+'_model.pt')):
         model = torch.load(root+'_model.pt', map_location=device)
@@ -279,10 +286,10 @@ def temp():
         model.to(device)
 
         params = [p for p in model.parameters() if p.requires_grad]
-        optimizer = torch.optim.SGD(params, lr=0.005, momentum=0.9, weight_decay=0.0005)
+        optimizer = torch.optim.SGD(params, lr=0.004, momentum=0.9, weight_decay=0.0005)
         lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
 
-        num_epochs = 12
+        num_epochs = 10
 
         for epoch in range(num_epochs):
             train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=10)
