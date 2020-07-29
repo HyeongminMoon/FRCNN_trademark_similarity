@@ -66,16 +66,16 @@ class ViennaDataset(torch.utils.data.Dataset):
             boxes.append([xmin,ymin,xmax,ymax])
         
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
-        if int(self.imgs[idx][0]) is 4:
-            labels = torch.full((num_objs,), 1, dtype=torch.int64)
-        elif int(self.imgs[idx][0]) is 5:
-            labels = torch.full((num_objs,), 1, dtype=torch.int64)
-        elif int(self.imgs[idx][0]) is 6:
-            labels = torch.full((num_objs,), 4, dtype=torch.int64)
-        elif int(self.imgs[idx][0]) is 7:
-            labels = torch.full((num_objs,), 5, dtype=torch.int64)
-        else:
-            labels = torch.full((num_objs,), int(self.imgs[idx][0]), dtype=torch.int64)
+        #if int(self.imgs[idx][0]) is 4:
+        #    labels = torch.full((num_objs,), 1, dtype=torch.int64)
+        #elif int(self.imgs[idx][0]) is 5:
+        #    labels = torch.full((num_objs,), 1, dtype=torch.int64)
+        #elif int(self.imgs[idx][0]) is 6:
+        #    labels = torch.full((num_objs,), 4, dtype=torch.int64)
+        #elif int(self.imgs[idx][0]) is 7:
+        #    labels = torch.full((num_objs,), 5, dtype=torch.int64)
+        #else:
+        labels = torch.full((num_objs,), int(self.imgs[idx][0]), dtype=torch.int64)
         masks = torch.as_tensor(masks, dtype=torch.uint8)
 
         image_id = torch.tensor([idx])
@@ -265,8 +265,8 @@ def temp():
         device = torch.device('cpu')
 
     #define classes
-    num_classes = 6
-    labels = ['background','human','crown','star','jewel','animal']
+    num_classes = 8
+    labels = ['background','woman','crown','star','man','child','jewel','animal']
     # load model. if none, train.
     if (os.path.isfile(root+'_model.pt')):
         model = torch.load(root+'_model.pt', map_location=device)
@@ -330,7 +330,7 @@ def temp():
         for j in range(num_boxes):
             #if prediction[0]['scores'][j].cpu().numpy() < 0.3 :
             #    continue
-            if num >= 3: break
+            if num >= 5: break
             str_ = labels[prediction[0]['labels'][j].cpu().numpy()]
             if str_ in p: continue
             c0 = prediction[0]['boxes'][j].cpu().numpy()
