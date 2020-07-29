@@ -22,6 +22,7 @@ from engine import train_one_epoch, evaluate
 import utils
 from torchvision import transforms as T
 
+import shutil
 """
 data에는 __getitem__과 __len__이 있어야 함.
 __getitem__은 image, target을 반환해야 함.
@@ -65,14 +66,16 @@ class ViennaDataset(torch.utils.data.Dataset):
             boxes.append([xmin,ymin,xmax,ymax])
         
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
-        #if int(self.imgs[idx][0]) is 4:
-        #    labels = torch.full((num_objs,), 1, dtype=torch.int64)
-        #elif int(self.imgs[idx][0]) is 5:
-        #    labels = torch.full((num_objs,), 1, dtype=torch.int64)
-        #elif int(self.imgs[idx][0]) is 6:
-        #    labels = torch.full((num_objs,), 4, dtype=torch.int64)
-        #else:
-        labels = torch.full((num_objs,), int(self.imgs[idx][0]), dtype=torch.int64)
+        if int(self.imgs[idx][0]) is 4:
+            labels = torch.full((num_objs,), 1, dtype=torch.int64)
+        elif int(self.imgs[idx][0]) is 5:
+            labels = torch.full((num_objs,), 1, dtype=torch.int64)
+        elif int(self.imgs[idx][0]) is 6:
+            labels = torch.full((num_objs,), 4, dtype=torch.int64)
+        elif int(self.imgs[idx][0]) is 7:
+            labels = torch.full((num_objs,), 5, dtype=torch.int64)
+        else:
+            labels = torch.full((num_objs,), int(self.imgs[idx][0]), dtype=torch.int64)
         masks = torch.as_tensor(masks, dtype=torch.uint8)
 
         image_id = torch.tensor([idx])
@@ -242,8 +245,8 @@ def temp():
     #dataset_test = PennFudanDataset('PennFudanPed', get_transform(train=False))
     torch.manual_seed(1)
     indices = torch.randperm(len(dataset)).tolist()
-    dataset = torch.utils.data.Subset(dataset, indices[:])
-    dataset_test = torch.utils.data.Subset(dataset_test, indices[-100:])
+    dataset = torch.utils.data.Subset(dataset, indices[:-50])
+    dataset_test = torch.utils.data.Subset(dataset_test, indices[-50:])
     # can error: try num_workers=0
     data_loader = torch.utils.data.DataLoader(
         dataset, batch_size=1, shuffle=True, num_workers=4, collate_fn=utils.collate_fn
@@ -262,8 +265,8 @@ def temp():
         device = torch.device('cpu')
 
     #define classes
-    num_classes = 7
-    labels = ['background','woman','crown','star','man','child','jewel']
+    num_classes = 6
+    labels = ['background','human','crown','star','jewel','animal']
     # load model. if none, train.
     if (os.path.isfile(root+'_model.pt')):
         model = torch.load(root+'_model.pt', map_location=device)
@@ -295,12 +298,15 @@ def temp():
             train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=10)
             lr_scheduler.step()
             torch.cuda.empty_cache()
-            #evaluate(model, data_loader_test, device=device)
+        evaluate(model, data_loader_test, device=device)
 
     # save
     torch.save(model, root+'_model.pt')
 
     # test
+    shutil.rmtree('results/')
+    os.mkdir('results')
+
     print(len(dataset_test))
     for i in range(len(dataset_test)):
         img, _ = dataset_test[i]
@@ -309,31 +315,43 @@ def temp():
             prediction = model([img.to(device)])
 
         im1 = Image.fromarray(img.mul(200).permute(1, 2, 0).byte().numpy())
-
+        
+        print(prediction[0]['scores'])
+        print(prediction[0]['labels'])
         # draw bounding boxes & mask layer & label
         num_boxes = len(prediction[0]['boxes'])
         colors = pkl.load(open("pallete", "rb"))
         im1_ = ImageDraw.Draw(im1)
+        
+        #top 3
+        predicted_labels = ''
+        p = []
+        num = 0
         for j in range(num_boxes):
-            if prediction[0]['scores'][j].cpu().numpy() < 0.6 :
-                continue
+            #if prediction[0]['scores'][j].cpu().numpy() < 0.3 :
+            #    continue
+            if num >= 3: break
+            str_ = labels[prediction[0]['labels'][j].cpu().numpy()]
+            if str_ in p: continue
             c0 = prediction[0]['boxes'][j].cpu().numpy()
             c1 = tuple(c0[:2])
             c2 = tuple(c0[2:])
-            im2 = Image.fromarray(prediction[0]['masks'][j, 0].mul(205).byte().cpu().numpy())
+            im2 = Image.fromarray(prediction[0]['masks'][j, 0].mul(100).byte().cpu().numpy())
             color = random.choice(colors)
             layer = Image.new('RGB', im2.size, color)
             # bounding box
             im1_.rectangle((c1, c2), outline=color)
             # label
-            str_ = labels[prediction[0]['labels'][j].cpu().numpy()]
+            predicted_labels = predicted_labels + '_' + str_
             score_ = prediction[0]['scores'][j].cpu().numpy()
             score = np.round(score_, 4)
             im1_.text(c1, str_ + " score:" + str(score), fill=(255, 255, 255, 255))
             # mask layer
             im1.paste(layer, (0, 0), im2)
+            p.append(str_)
+            num += 1
 
-        fp1 = open('results/'+str(i)+'_detection.jpg', 'w')
+        fp1 = open('results/'+str(i)+'_detection'+predicted_labels+'.jpg', 'w')
         im1.save(fp1, "JPEG")
 
         #fp2 = open('results/'+str(i)+'_mask.jpg', 'w')
