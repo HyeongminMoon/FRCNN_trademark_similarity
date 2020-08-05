@@ -34,12 +34,12 @@ class ViennaDataset(torch.utils.data.Dataset):
         self.root = root
         self.transforms = transforms
         # Load images, sorting them
-        self.imgs = list(sorted(os.listdir(os.path.join(root, "00/images"))))
+        self.imgs = list(sorted(os.listdir(os.path.join(root, "00/image"))))
         #self.masks = list(sorted(os.listdir(os.path.join(root, "00/mask"))))
 
 
     def __getitem__(self, idx):
-        img_path = os.path.join(self.root, "00/images", self.imgs[idx])
+        img_path = os.path.join(self.root, "00/image", self.imgs[idx])
         mask_path = os.path.join(self.root, "00/mask", self.imgs[idx].replace(".jpg","_mask.png"))
         
         #img_path = os.path.join(self.root, "crown_woman/images/2big_img_105.jpg")
@@ -75,7 +75,7 @@ class ViennaDataset(torch.utils.data.Dataset):
         #elif int(self.imgs[idx][0]) is 7:
         #    labels = torch.full((num_objs,), 5, dtype=torch.int64)
         #else:
-        labels = torch.full((num_objs,), int(self.imgs[idx][0]), dtype=torch.int64)
+        labels = torch.full((num_objs,), int(self.imgs[idx][0:2]), dtype=torch.int64)
         masks = torch.as_tensor(masks, dtype=torch.uint8)
 
         image_id = torch.tensor([idx])
@@ -245,11 +245,12 @@ def temp():
     #dataset_test = PennFudanDataset('PennFudanPed', get_transform(train=False))
     torch.manual_seed(1)
     indices = torch.randperm(len(dataset)).tolist()
-    dataset = torch.utils.data.Subset(dataset, indices[:-50])
-    dataset_test = torch.utils.data.Subset(dataset_test, indices[-50:])
+    t = int(len(indices)*0.2) # 20% test data
+    dataset = torch.utils.data.Subset(dataset, indices[:-t])
+    dataset_test = torch.utils.data.Subset(dataset_test, indices[-t:])
     # can error: try num_workers=0
     data_loader = torch.utils.data.DataLoader(
-        dataset, batch_size=1, shuffle=True, num_workers=4, collate_fn=utils.collate_fn
+        dataset, batch_size=1, shuffle=False, num_workers=4, collate_fn=utils.collate_fn
     )
     data_loader_test = torch.utils.data.DataLoader(
         dataset_test, batch_size=1, shuffle=False, num_workers=4, collate_fn=utils.collate_fn
@@ -265,8 +266,10 @@ def temp():
         device = torch.device('cpu')
 
     #define classes
-    num_classes = 8
-    labels = ['background','woman','crown','star','man','child','jewel','animal']
+    num_classes = 26
+    labels = ['background','woman','crown','star','man','child','jewel','animal','sun','moon','amphibia',
+              'aqua_animal','bird','building','ceramic','dinosaur','flag','furniture','leaf','planet','plate',
+              'ship','shoes','stationery','watch','wheel']
     # load model. if none, train.
     if (os.path.isfile(root+'_model.pt')):
         model = torch.load(root+'_model.pt', map_location=device)
@@ -290,12 +293,15 @@ def temp():
 
         params = [p for p in model.parameters() if p.requires_grad]
         optimizer = torch.optim.SGD(params, lr=0.004, momentum=0.9, weight_decay=0.0005)
-        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.1)
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.7)
 
-        num_epochs = 10
+        num_epochs = 20
 
         for epoch in range(num_epochs):
-            train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=10)
+            try:
+                train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=1)
+            except:
+                print("nan loss except")
             lr_scheduler.step()
             torch.cuda.empty_cache()
         evaluate(model, data_loader_test, device=device)
@@ -313,11 +319,11 @@ def temp():
         model.eval()
         with torch.no_grad():
             prediction = model([img.to(device)])
-
+        #print(prediction)
         im1 = Image.fromarray(img.mul(200).permute(1, 2, 0).byte().numpy())
         
-        print(prediction[0]['scores'])
-        print(prediction[0]['labels'])
+        #print(prediction[0]['scores'])
+        #print(prediction[0]['labels'])
         # draw bounding boxes & mask layer & label
         num_boxes = len(prediction[0]['boxes'])
         colors = pkl.load(open("pallete", "rb"))
@@ -330,7 +336,7 @@ def temp():
         for j in range(num_boxes):
             #if prediction[0]['scores'][j].cpu().numpy() < 0.3 :
             #    continue
-            if num >= 5: break
+            if num >= 7: break
             str_ = labels[prediction[0]['labels'][j].cpu().numpy()]
             if str_ in p: continue
             c0 = prediction[0]['boxes'][j].cpu().numpy()
@@ -362,7 +368,18 @@ def temp():
 
 
 if __name__ == '__main__':
+    #names = os.listdir("image/00/image/")
+    #for n in names:
+    #    if not os.path.isfile("image/00/mask/"+n[:-4]+"_mask.png"):
+    #        print(n)
+    #        os.remove("image/00/image/"+n)
     temp()
+    names = os.listdir("image/00/image/")
+    cnt = 0
+    for n in names:
+        cnt +=1
+        if 72 <= cnt <= 73:
+            print(n)
     #change_name("image/crown_woman/mask/",2)
     #json_path = 'image/0203/0203mask.json'
     #img_path = 'image/0203/'
