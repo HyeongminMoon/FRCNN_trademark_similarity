@@ -66,16 +66,51 @@ class ViennaDataset(torch.utils.data.Dataset):
             boxes.append([xmin,ymin,xmax,ymax])
         
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
-        #if int(self.imgs[idx][0]) is 4:
-        #    labels = torch.full((num_objs,), 1, dtype=torch.int64)
-        #elif int(self.imgs[idx][0]) is 5:
-        #    labels = torch.full((num_objs,), 1, dtype=torch.int64)
-        #elif int(self.imgs[idx][0]) is 6:
-        #    labels = torch.full((num_objs,), 4, dtype=torch.int64)
-        #elif int(self.imgs[idx][0]) is 7:
-        #    labels = torch.full((num_objs,), 5, dtype=torch.int64)
-        #else:
-        labels = torch.full((num_objs,), int(self.imgs[idx][0:2]), dtype=torch.int64)
+
+        code = int(self.imgs[idx][0])
+        human = [1,4,5]
+        animal = [7,10,11,12,15,37]
+        circle = [8,19,24,25,31,35,49]
+        bowl = [14,20,30,48]
+        triangle = [3,6,9,16,18,47,52]
+        rect = [13,17,29,43,55]
+        tree = [46,51]
+        car = [21,26,53]
+        tool = [23,33,45]
+        hat = [2,34,36,50]
+        cross = [27,28,32,54]
+        part = [22,41]
+        landscape = [38,39,40,42,44]
+        if code is in human:
+            labels = torch.full((num_objs,), 1, dtype=torch.int64)
+        elif code is in animal:
+            labels = torch.full((num_objs,), 2, dtype=torch.int64)
+        elif code is in circle:
+            labels = torch.full((num_objs,), 3, dtype=torch.int64)
+        elif code is in bowl:
+            labels = torch.full((num_objs,), 4, dtype=torch.int64)
+        elif code is in triangle:
+            labels = torch.full((num_objs,), 5, dtype=torch.int64)
+        elif code is in rect:
+            labels = torch.full((num_objs,), 6, dtype=torch.int64)
+        elif code is in tree:
+            labels = torch.full((num_objs,), 7, dtype=torch.int64)
+        elif code is in car:
+            labels = torch.full((num_objs,), 8, dtype=torch.int64)
+        elif code is in tool:
+            labels = torch.full((num_objs,), 9, dtype=torch.int64)
+        elif code is in hat:
+            labels = torch.full((num_objs,), 10, dtype=torch.int64)
+        elif code is in cross:
+            labels = torch.full((num_objs,), 11, dtype=torch.int64)
+        elif code is in part:
+            labels = torch.full((num_objs,), 12, dtype=torch.int64)
+        elif code is in landscape:
+            labels = torch.full((num_objs,), 13, dtype=torch.int64)
+        else:
+            print("no code error")
+        
+        #labels = torch.full((num_objs,), int(self.imgs[idx][0:2]), dtype=torch.int64)
         masks = torch.as_tensor(masks, dtype=torch.uint8)
 
         image_id = torch.tensor([idx])
@@ -257,7 +292,7 @@ def temp():
     )
 
     # for GPU. if you use CPU, remove below lines
-    torch.cuda.get_device_name(0)
+    torch.cuda.get_device_name(1)
     use_cuda = torch.cuda.is_available()
     # use_cuda = False
     if use_cuda:
@@ -266,13 +301,34 @@ def temp():
         device = torch.device('cpu')
 
     #define classes
-    num_classes = 26
+    num_classes = 56
     labels = ['background','woman','crown','star','man','child','jewel','animal','sun','moon','amphibia',
-              'aqua_animal','bird','building','ceramic','dinosaur','flag','furniture','leaf','planet','plate',
-              'ship','shoes','stationery','watch','wheel']
+              'aqua','bird','building','ceramic','dinosaur','flag','furniture','leaf','planet','plate',
+              'ship','shoes','stationery','watch','wheel','airplane','anchor','atom','book','bowl',
+              'circle','cross','food','hat','heart','helmat','insect','landscape','map','mountain',
+              'part','plantac','rect','river','tool','tree','triangle','bottle','fruit','phone',
+              'flower','arrow','car','ribbon','shield']
+    num_classes = 14
+    labels = ['background', 'human', 'animal', 'circle', 'bowl', 'triangle', 'rect', 'tree', 'car', 'tool', 'hat', 'cross', 'part', 'landsacpe']
+    #human = ['man', 'child', 'woman']
+    #animal = ['animal','aqua','bird','amphibia','dinosaur','insect']
+    #circle = ['sun', 'circle','heart','planet','wheel','watch','fruit']
+    #bowl = ['bowl', 'plate', 'bottle', 'ceramic']
+    #triangle = ['star','moon','jewel','leaf','triangle','arrow','flag']
+    #rect = ['rect', 'building','book','furniture','shield']
+    #tree = ['tree','flower']
+    #car = ['car', 'ship', 'airplane']
+    #tool = ['stationery','food','tool']
+    #hat = ['hat','helmat','crown','phone']
+    #cross = ['cross','anchor','atom','ribbon']
+    #part = ['part', 'shoes']
+    #landscape = ['landscape', 'map', 'mountain','plantac','river']
+
+
     # load model. if none, train.
     if (os.path.isfile(root+'_model.pt')):
         model = torch.load(root+'_model.pt', map_location=device)
+        #evaluate(model, data_loader_test, device=device)
         #model = get_instance_segmentation_model(num_classes)
         """model.to(device)
 
@@ -295,19 +351,15 @@ def temp():
         optimizer = torch.optim.SGD(params, lr=0.004, momentum=0.9, weight_decay=0.0005)
         lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=3, gamma=0.7)
 
-        num_epochs = 20
+        num_epochs = 15
 
         for epoch in range(num_epochs):
-            try:
-                train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=1)
-            except:
-                print("nan loss except")
+            train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=1)
             lr_scheduler.step()
-            torch.cuda.empty_cache()
-        evaluate(model, data_loader_test, device=device)
+        #evaluate(model, data_loader_test, device=device)
 
-    # save
-    torch.save(model, root+'_model.pt')
+        # save
+        torch.save(model, root+'_model.pt')
 
     # test
     shutil.rmtree('results/')
@@ -315,6 +367,9 @@ def temp():
 
     print(len(dataset_test))
     for i in range(len(dataset_test)):
+        print(i)
+        if i == 302 or i == 601 or i == 723 : continue
+        #torch.cuda.empty_cache()
         img, _ = dataset_test[i]
         model.eval()
         with torch.no_grad():
@@ -368,17 +423,17 @@ def temp():
 
 
 if __name__ == '__main__':
-    #names = os.listdir("image/00/image/")
-    #for n in names:
-    #    if not os.path.isfile("image/00/mask/"+n[:-4]+"_mask.png"):
-    #        print(n)
-    #        os.remove("image/00/image/"+n)
+    names = os.listdir("image/00/image/")
+    for n in names:
+        if not os.path.isfile("image/00/mask/"+n[:-4]+"_mask.png"):
+            print(n)
+            os.remove("image/00/image/"+n)
     temp()
     names = os.listdir("image/00/image/")
     cnt = 0
     for n in names:
         cnt +=1
-        if 72 <= cnt <= 73:
+        if cnt == 3065:
             print(n)
     #change_name("image/crown_woman/mask/",2)
     #json_path = 'image/0203/0203mask.json'
