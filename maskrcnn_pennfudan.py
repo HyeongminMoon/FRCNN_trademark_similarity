@@ -28,6 +28,9 @@ data에는 __getitem__과 __len__이 있어야 함.
 __getitem__은 image, target을 반환해야 함.
 __len__은 이미지의 길이를 반환.
 """
+def cos_sim(A, B):
+    return np.dot(A, B) / (np.linalg.norm(A) * np.linalg.norm(B))
+
 class ViennaDataset(torch.utils.data.Dataset):
 
     def __init__(self, root, transforms=None, test_mode = False):
@@ -47,7 +50,7 @@ class ViennaDataset(torch.utils.data.Dataset):
             img = Image.open(img_path).convert("RGB")
             if self.transforms is not None:
                 img = self.transforms(img)
-            return img, {}
+            return img, self.imgs[idx]
             
         img_path = os.path.join(self.root, "00/image", self.imgs[idx])
         mask_path = os.path.join(self.root, "00/mask", self.imgs[idx].replace(".jpg","_mask.png"))
@@ -326,8 +329,15 @@ def change_name(path,num):
 
 
 def extract_code():
-
+    input_id = 9
+    shutil.rmtree('../../input/')
+    os.mkdir('../../input/')
+    shutil.copy('../../images/img_' + str(input_id) + '.jpg', '../../input/img_' + str(input_id) + '.jpg')
     root = '../../images'
+
+    input_feature = np.load('../../npys/' + str(input_id) + '.npy')
+
+    dataset_input = ViennaDataset("../../input", get_transform(train=False), test_mode = True)
     dataset_test = ViennaDataset(root, get_transform(train=False), test_mode = True)
     #dataset_test = PennFudanDataset('PennFudanPed', get_transform(train=False))
     torch.manual_seed(1)
@@ -346,27 +356,11 @@ def extract_code():
         device = torch.device('cpu')
 
     #define classes
-    num_classes = 56
-    labels = ['background','woman','crown','star','man','child','jewel','animal','sun','moon','amphibia',
-              'aqua','bird','building','ceramic','dinosaur','flag','furniture','leaf','planet','plate',
-              'ship','shoes','stationery','watch','wheel','airplane','anchor','atom','book','bowl',
-              'circle','cross','food','hat','heart','helmat','insect','landscape','map','mountain',
-              'part','plantac','rect','river','tool','tree','triangle','bottle','fruit','phone',
-              'flower','arrow','car','ribbon','shield']
     num_classes = 29
     labels = ['background', 'character', 'sun', 'planet', 'heart', 'ceramic', 'bottle', 'bowl', 'star', 'jewel',
               'moon','triangle','arrow','rect','shield','building','tree','flower','car','airplane',
               'crown','hat','cross','landscape','mountain','plantac','leaf','fruit','tool']
     
-    #num_classes = 10
-    #labels = ['background', 'woman','man','child','animal','amphibia','aqua','bird','dinosaur','insect']
-    #num_classes = 5
-    #labels = ['background', 'human', 'animal', 'bird', 'insect']
-    
-    #num_classes = 14
-    #labels = ['background', 'human', 'animal', 'circle', 'bowl', 'triangle', 'rect', 'tree', 'car', 'tool', 'hat', 'cross', 'part', 'landsacpe']
-
-    # load model. if none, train.
     if (os.path.isfile('image_model.pt')):
         model = torch.load('image_model.pt', map_location=device)
     else:
@@ -374,48 +368,94 @@ def extract_code():
     # test
     shutil.rmtree('results/')
     os.mkdir('results')
-
+    #input
+    img, name = dataset_input[0]
+    model.eval()
+    with torch.no_grad():
+        prediction = model([img.to(device)])    
+    num_boxes = len(prediction[0]['boxes'])
+    p = []
+    num = 0
+    for j in range(num_boxes):
+        if prediction[0]['scores'][j].cpu().numpy() < 0.2 :
+            continue
+        if num >= 3: break
+        str_ = labels[prediction[0]['labels'][j].cpu().numpy()]
+        if str_ in p: continue
+        p.append(str_)
+        num += 1
+    p.sort()
+    input_name = name
+    input_code = p
+    print(input_name,input_code)
+    
+    same_list = []
     print(len(dataset_test))
-    for i in range(min(500,len(dataset_test))):
-        img, _ = dataset_test[i]
-        model.eval()
-        with torch.no_grad():
-            prediction = model([img.to(device)])
-        im1 = Image.fromarray(img.mul(200).permute(1, 2, 0).byte().numpy())
-        num_boxes = len(prediction[0]['boxes'])
-        colors = pkl.load(open("pallete", "rb"))
-        im1_ = ImageDraw.Draw(im1)
-        #top 3
-        predicted_labels = ''
-        p = []
-        num = 0
-        for j in range(num_boxes):
-            if prediction[0]['scores'][j].cpu().numpy() < 0.2 :
-                continue
-            if num >= 3: break
-            str_ = labels[prediction[0]['labels'][j].cpu().numpy()]
-            if str_ in p: continue
-            c0 = prediction[0]['boxes'][j].cpu().numpy()
-            c1 = tuple(c0[:2])
-            c2 = tuple(c0[2:])
-            im2 = Image.fromarray(prediction[0]['masks'][j, 0].mul(100).byte().cpu().numpy())
-            color = random.choice(colors)
-            layer = Image.new('RGB', im2.size, color)
-            # bounding box
-            im1_.rectangle((c1, c2), outline=color)
-            # label
-            predicted_labels = predicted_labels + '_' + str_
-            score_ = prediction[0]['scores'][j].cpu().numpy()
-            score = np.round(score_, 4)
-            im1_.text(c1, str_ + " score:" + str(score), fill=(255, 255, 255, 255))
-            # mask layer
-            im1.paste(layer, (0, 0), im2)
-            p.append(str_)
-            num += 1
-
-        fp1 = open('results/'+str(i)+'_detection'+predicted_labels+'.jpg', 'w')
-        im1.save(fp1, "JPEG")
-        fp1.close()
+    for i in range(min(100000,len(dataset_test))):
+        try:
+            torch.cuda.empty_cache()
+            img, name = dataset_test[i]
+            model.eval()
+            with torch.no_grad():
+                prediction = model([img.to(device)])
+            im1 = Image.fromarray(img.mul(255).permute(1, 2, 0).byte().numpy())
+            num_boxes = len(prediction[0]['boxes'])
+            colors = pkl.load(open("pallete", "rb"))
+            im1_ = ImageDraw.Draw(im1)
+            #top 3
+            predicted_labels = ''
+            p = []
+            num = 0
+            for j in range(num_boxes):
+                if prediction[0]['scores'][j].cpu().numpy() < 0.2 :
+                    continue
+                if num >= 3: break
+                str_ = labels[prediction[0]['labels'][j].cpu().numpy()]
+                if str_ in p: continue
+                c0 = prediction[0]['boxes'][j].cpu().numpy()
+                c1 = tuple(c0[:2])
+                c2 = tuple(c0[2:])
+                #im2 = Image.fromarray(prediction[0]['masks'][j, 0].mul(100).byte().cpu().numpy())
+                #color = random.choice(colors)
+                #layer = Image.new('RGB', im2.size, color)
+                # bounding box
+                #im1_.rectangle((c1, c2), outline=color)
+                # label
+                predicted_labels = predicted_labels + '_' + str_
+                score_ = prediction[0]['scores'][j].cpu().numpy()
+                score = np.round(score_, 4)
+                #im1_.text(c1, str_ + " score:" + str(score), fill=(255, 255, 255, 255))
+                # mask layer
+                #im1.paste(layer, (0, 0), im2)
+                p.append(str_)
+                num += 1
+            #fp1 = open('results/'+str(i)+'_detection'+predicted_labels+'.jpg', 'w')
+            #im1.save(fp1, "JPEG")
+            #fp1.close()
+            p.sort()
+            print(name, p)
+            same_num = 0
+            for code in input_code:
+                if code in p:
+                    same_num += 1           
+            if same_num == 3:
+                code_sim = 1.0
+            elif same_num == 2:
+                code_sim = 0.95
+            elif same_num == 1:
+                code_sim = 0.9
+            else:
+                code_sim = 0.85
+            load_feature = np.load('../../npys/' + name[4:-4] + '.npy')
+            img_sim = cos_sim(input_feature[0], load_feature[0])
+            similarity = round(code_sim * img_sim, 6)
+            print("sim:",similarity)
+            path_ = "results/" + str(similarity)[2:] + name
+            fp1 = open(path_, 'w')
+            im1.save(fp1, "JPEG")
+            fp1.close()
+        except:
+            print("except name:",name)
 
 def temp():
     # simple check for dataset
@@ -526,7 +566,7 @@ def temp():
     print(len(dataset_test))
     for i in range(len(dataset_test)):
         if i == 302 or i == 601 or i == 723 : continue
-        #torch.cuda.empty_cache()
+        torch.cuda.empty_cache()
         img, _ = dataset_test[i]
         model.eval()
         with torch.no_grad():
