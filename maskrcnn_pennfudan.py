@@ -23,13 +23,17 @@ import utils
 from torchvision import transforms as T
 
 import shutil
+import heapq
 """
 data에는 __getitem__과 __len__이 있어야 함.
 __getitem__은 image, target을 반환해야 함.
 __len__은 이미지의 길이를 반환.
 """
 def cos_sim(A, B):
-    return np.dot(A, B) / (np.linalg.norm(A) * np.linalg.norm(B))
+    device = torch.device('cuda')
+    A = torch.from_numpy(A).to(device)
+    B = torch.from_numpy(B).to(device)
+    return F.cosine_similarity(A,B)
 
 class ViennaDataset(torch.utils.data.Dataset):
 
@@ -328,23 +332,24 @@ def change_name(path,num):
         os.rename(path + imgs[i],path + str(num)+imgs[i])
 
 
-def extract_code():
-    input_id = 9
+def extract_code(input_id):
+    if not os.path.isdir(str(input_id)):
+        os.mkdir(str(input_id))
+    #input_id = 12524
     shutil.rmtree('../../input/')
     os.mkdir('../../input/')
     shutil.copy('../../images/img_' + str(input_id) + '.jpg', '../../input/img_' + str(input_id) + '.jpg')
     root = '../../images'
 
-    input_feature = np.load('../../npys/' + str(input_id) + '.npy')
 
     dataset_input = ViennaDataset("../../input", get_transform(train=False), test_mode = True)
-    dataset_test = ViennaDataset(root, get_transform(train=False), test_mode = True)
+    #dataset_test = ViennaDataset(root, get_transform(train=False), test_mode = True)
     #dataset_test = PennFudanDataset('PennFudanPed', get_transform(train=False))
     torch.manual_seed(1)
     # can error: try num_workers=0
-    data_loader_test = torch.utils.data.DataLoader(
-        dataset_test, batch_size=1, shuffle=False, num_workers=4, collate_fn=utils.collate_fn
-    )
+    #data_loader_test = torch.utils.data.DataLoader(
+    #    dataset_test, batch_size=1, shuffle=False, num_workers=4, collate_fn=utils.collate_fn
+    #)
 
     # for GPU. if you use CPU, remove below lines
     torch.cuda.get_device_name(1)
@@ -366,8 +371,8 @@ def extract_code():
     else:
         print("model doesn't exist")
     # test
-    shutil.rmtree('results/')
-    os.mkdir('results')
+    shutil.rmtree(str(input_id))
+    os.mkdir(str(input_id))
     #input
     img, name = dataset_input[0]
     model.eval()
@@ -381,59 +386,74 @@ def extract_code():
             continue
         if num >= 3: break
         str_ = labels[prediction[0]['labels'][j].cpu().numpy()]
-        if str_ in p: continue
-        p.append(str_)
+        index = labels.index(str_)
+        if index in p: continue
+        p.append(index)
         num += 1
     p.sort()
     input_name = name
     input_code = p
-    print(input_name,input_code)
+    print(input_name, input_code)
     
     same_list = []
-    print(len(dataset_test))
-    for i in range(min(100000,len(dataset_test))):
+    sim_list = []
+    correct_coef = (3 - len(input_code)) * 0.05
+    
+    img_list = list(sorted(os.listdir('../../npys_code/')))
+    load_features = np.load('../../npys.npy')
+    input_feature = np.full(load_features.shape,load_features[input_id-1])
+
+    load_features = torch.from_numpy(load_features).to(device)
+    input_feature = torch.from_numpy(input_feature).to(device)
+
+    img_sim = F.cosine_similarity(input_feature,load_features)
+    for i in range(len(img_sim)):
         try:
-            torch.cuda.empty_cache()
-            img, name = dataset_test[i]
-            model.eval()
-            with torch.no_grad():
-                prediction = model([img.to(device)])
-            im1 = Image.fromarray(img.mul(255).permute(1, 2, 0).byte().numpy())
-            num_boxes = len(prediction[0]['boxes'])
-            colors = pkl.load(open("pallete", "rb"))
-            im1_ = ImageDraw.Draw(im1)
+            #model.eval()
+            #with torch.no_grad():
+            #    prediction = model([img.to(device)])
+            #im1 = Image.fromarray(img.mul(255).permute(1, 2, 0).byte().numpy())
+            #num_boxes = len(prediction[0]['boxes'])
+            #colors = pkl.load(open("pallete", "rb"))
+            #im1_ = ImageDraw.Draw(im1)
             #top 3
-            predicted_labels = ''
-            p = []
-            num = 0
-            for j in range(num_boxes):
-                if prediction[0]['scores'][j].cpu().numpy() < 0.2 :
-                    continue
-                if num >= 3: break
-                str_ = labels[prediction[0]['labels'][j].cpu().numpy()]
-                if str_ in p: continue
-                c0 = prediction[0]['boxes'][j].cpu().numpy()
-                c1 = tuple(c0[:2])
-                c2 = tuple(c0[2:])
+            #predicted_labels = ''
+            #p = []
+            #num = 0
+            #for j in range(num_boxes):
+            #    if prediction[0]['scores'][j].cpu().numpy() < 0.2 :
+            #        continue
+            #    if num >= 3: break
+            #    str_ = labels[prediction[0]['labels'][j].cpu().numpy()]
+            #    index = labels.index(str_)
+            #    if index in p: continue
+            #    c0 = prediction[0]['boxes'][j].cpu().numpy()
+            #    c1 = tuple(c0[:2])
+            #    c2 = tuple(c0[2:])
+            
                 #im2 = Image.fromarray(prediction[0]['masks'][j, 0].mul(100).byte().cpu().numpy())
                 #color = random.choice(colors)
                 #layer = Image.new('RGB', im2.size, color)
                 # bounding box
                 #im1_.rectangle((c1, c2), outline=color)
                 # label
-                predicted_labels = predicted_labels + '_' + str_
-                score_ = prediction[0]['scores'][j].cpu().numpy()
-                score = np.round(score_, 4)
+            #    predicted_labels = predicted_labels + '_' + str_
+            #    score_ = prediction[0]['scores'][j].cpu().numpy()
+            #    score = np.round(score_, 4)
                 #im1_.text(c1, str_ + " score:" + str(score), fill=(255, 255, 255, 255))
                 # mask layer
                 #im1.paste(layer, (0, 0), im2)
-                p.append(str_)
-                num += 1
-            #fp1 = open('results/'+str(i)+'_detection'+predicted_labels+'.jpg', 'w')
-            #im1.save(fp1, "JPEG")
-            #fp1.close()
-            p.sort()
-            print(name, p)
+            #    p.append(index)
+            #    num += 1
+                #fp1 = open('results/'+str(i)+'_detection'+predicted_labels+'.jpg', 'w')
+                #im1.save(fp1, "JPEG")
+                #fp1.close()
+            #p.sort()
+            #print(name, p)
+            #name[4:-4]
+            if img_sim[i].item() < 0.65: continue
+            p = np.load("../../npys_code/" + str(i+1) + '.npy')
+            #np.save("../../npys_code/" + name[4:-4], np.array(p))
             same_num = 0
             for code in input_code:
                 if code in p:
@@ -443,23 +463,29 @@ def extract_code():
             elif same_num == 2:
                 code_sim = 0.95
             elif same_num == 1:
-                code_sim = 0.9
+                code_sim = 0.8
             else:
                 code_sim = 0.85
-            load_feature = np.load('../../npys/' + name[4:-4] + '.npy')
-            img_sim = cos_sim(input_feature[0], load_feature[0])
-            similarity = round(code_sim * img_sim, 6)
-            print("sim:",similarity)
-            path_ = "results/" + str(similarity)[2:] + name
-            fp1 = open(path_, 'w')
-            im1.save(fp1, "JPEG")
-            fp1.close()
+            code_sim += correct_coef
+            similarity = round(code_sim * img_sim[i].item(), 6)
+            if similarity > 0.3:
+                sim_list.append([str(i+1),similarity])
+            print(i,end='\r')
+            #path_ = "results/" + str(format(similarity,"6f"))[2:] + name
+            #fp1 = open(path_, 'w')
+            #im1.save(fp1, "JPEG")
+            #fp1.close()
         except:
-            print("except name:",name)
+            print("except i:",i)
+    sim_list = sorted(sim_list, key=lambda s : s[1], reverse=True)
+    #print(sim_list)
+    for i in range(min(len(sim_list),100)):
+        shutil.copy('../../images/img_' + str(sim_list[i][0]) + '.jpg', str(input_id) + '/' + str(sim_list[i][1]) + '_' +str(sim_list[i][0]) + '.jpg')
 
 def temp():
     # simple check for dataset
     # test_PFD = PennFudanDataset('PennFudanPed')
+
     # test_PFD.__getitem__(0)
 
     root = 'image'
@@ -620,7 +646,12 @@ def temp():
 
 
 if __name__ == '__main__':
-    extract_code()
+    extract_code(88)
+    extract_code(96)
+    extract_code(1866)
+    extract_code(2130)
+    extract_code(4322)
+    extract_code(21230)
     #names = os.listdir("image/00/image/")
     #for n in names:
     #    if not os.path.isfile("image/00/mask/"+n[:-4]+"_mask.png"):
