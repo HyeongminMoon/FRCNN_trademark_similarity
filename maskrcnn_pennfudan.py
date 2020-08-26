@@ -400,8 +400,8 @@ def extract_code(input_id):
     correct_coef = (3 - len(input_code)) * 0.05
     
     img_list = list(sorted(os.listdir('../../npys_code/')))
-    load_features = np.load('../../npys.npy')
-    input_feature = np.full(load_features.shape,load_features[input_id-1])
+    load_features = np.load('../../npys_eb7_gray.npy')
+    input_feature = np.full(load_features.shape,load_features[input_id-1])#TODO
 
     load_features = torch.from_numpy(load_features).to(device)
     input_feature = torch.from_numpy(input_feature).to(device)
@@ -451,7 +451,7 @@ def extract_code(input_id):
             #p.sort()
             #print(name, p)
             #name[4:-4]
-            if img_sim[i].item() < 0.65: continue
+            if img_sim[i].item() < 0.4: continue
             p = np.load("../../npys_code/" + str(i+1) + '.npy')
             #np.save("../../npys_code/" + name[4:-4], np.array(p))
             same_num = 0
@@ -463,9 +463,9 @@ def extract_code(input_id):
             elif same_num == 2:
                 code_sim = 0.95
             elif same_num == 1:
-                code_sim = 0.8
+                code_sim = 0.9
             else:
-                code_sim = 0.85
+                code_sim = 0.8
             code_sim += correct_coef
             similarity = round(code_sim * img_sim[i].item(), 6)
             if similarity > 0.3:
@@ -480,7 +480,7 @@ def extract_code(input_id):
     sim_list = sorted(sim_list, key=lambda s : s[1], reverse=True)
     #print(sim_list)
     for i in range(min(len(sim_list),100)):
-        shutil.copy('../../images/img_' + str(sim_list[i][0]) + '.jpg', str(input_id) + '/' + str(sim_list[i][1]) + '_' +str(sim_list[i][0]) + '.jpg')
+        shutil.copy('../../images/img_' + str(sim_list[i][0]) + '.jpg', str(input_id) + '/' + str(format(sim_list[i][1],"6f")) + '_' +str(sim_list[i][0]) + '.jpg')
 
 def temp():
     # simple check for dataset
@@ -646,12 +646,48 @@ def temp():
 
 
 if __name__ == '__main__':
-    extract_code(88)
-    extract_code(96)
-    extract_code(1866)
-    extract_code(2130)
-    extract_code(4322)
-    extract_code(21230)
+    extract_code(199)
+    extract_code(382)
+    extract_code(324)
+    extract_code(593)
+    extract_code(656)
+    extract_code(733)
+    extract_code(734)
+    extract_code(747)
+    extract_code(1025)
+    extract_code(1225)
+    extract_code(1371)
+    extract_code(1511)
+    extract_code(1616)
+    extract_code(1772)
+    extract_code(2117)
+    extract_code(2296)
+    extract_code(2337)
+    extract_code(2338)
+    extract_code(2354)
+    extract_code(2373)
+    extract_code(2377)
+    extract_code(1617)
+    extract_code(1792)
+    extract_code(1841)
+    extract_code(1584)
+    extract_code(4487)
+    extract_code(1711)
+    extract_code(2436)
+    extract_code(2446)
+    extract_code(2638)
+    extract_code(2665)
+    extract_code(2899)
+    extract_code(3521)
+    extract_code(3646)
+    extract_code(4035)
+    extract_code(4058)
+    extract_code(4335)
+    extract_code(4447)
+    extract_code(4878)
+    extract_code(4919)
+    extract_code(2678)
+    extract_code(3998)
     #names = os.listdir("image/00/image/")
     #for n in names:
     #    if not os.path.isfile("image/00/mask/"+n[:-4]+"_mask.png"):
