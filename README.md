@@ -16,9 +16,9 @@ For example, the trademarks' viennacodes distribution is not flat because many t
 So we define new rule for this and made a new classification table.
 
 ### result samples
-<br><img src="./images/det1.jpg" width="250px" height="250px" title="det1" alt="det1"></img>
-<img src="./images/det2.jpg" width="250px" height="250px" title="det2" alt="det2"></img>
-<img src="./images/det3.jpg" width="250px" height="250px" title="det3" alt="det3"></img><br/>
+<br><img src="./images/det1.jpg" width="400px" height="250px" title="det1" alt="det1"></img>
+<img src="./images/det2.jpg" width="400px" height="250px" title="det2" alt="det2"></img>
+<img src="./images/det3.jpg" width="400px" height="250px" title="det3" alt="det3"></img><br/>
 
 
 ## Image Similarity
