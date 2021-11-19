@@ -1,5 +1,6 @@
 # FRCNN_trademark_similarity
 *this is not being maintained now*
+
 Using Faster RCNN and Mask RCNN, Implemented Multilabel classification and Image similarity.
 
 Implemented by Custom trademark dataset & custom class for training
@@ -21,3 +22,19 @@ So we define new rule for this and made a new classification table.
 
 
 ## Image Similarity
+We extracted the normal feature from efficientnet-b0 that pretrained by custom dataset and triplet loss.
+And we mixed it to Multi label classification result, and calculated the Cosine Similarity from it's fully connected vectors.
+So we can calculate image silmilarity score between 
+
+
+### result samples
+<br><img src="./images/sim1.jpg" width="250px" height="250px" title="sim1" alt="sim1"></img>
+<img src="./images/sim2.jpg" width="250px" height="250px" title="sim2" alt="sim2"></img>
+<img src="./images/sim3.jpg" width="250px" height="250px" title="sim3" alt="sim3"></img><br/>
+
+### Similar tradeamark searching service
+As an application of this repository, we made a Similar trademark seraching service.
+![image](https://user-images.githubusercontent.com/32811724/142619590-b5fa63a2-6b15-4720-9d99-cbd15fddc3c7.png)
+![image](https://user-images.githubusercontent.com/32811724/142619604-3c5aeaad-fa1d-4b18-b169-804314554c2e.png)
+
+
