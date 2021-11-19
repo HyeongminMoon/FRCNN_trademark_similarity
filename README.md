@@ -34,7 +34,7 @@ So we can calculate image silmilarity score between
 <img src="https://user-images.githubusercontent.com/32811724/142619840-5c51e3bb-9ec6-44ee-a3bc-63b35ebf0211.png" width="400px" height="250px"></img><br/>
 
 
-### Similar tradeamark searching service
+## Similar tradeamark searching service
 As an application of this repository, we made a Similar trademark seraching service.
 ![image](https://user-images.githubusercontent.com/32811724/142619590-b5fa63a2-6b15-4720-9d99-cbd15fddc3c7.png)
 ![image](https://user-images.githubusercontent.com/32811724/142619604-3c5aeaad-fa1d-4b18-b169-804314554c2e.png)
