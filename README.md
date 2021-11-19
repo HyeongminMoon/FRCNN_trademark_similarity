@@ -28,9 +28,9 @@ So we can calculate image silmilarity score between
 
 
 ### result samples
-<br><img src="./images/sim1.jpg" width="250px" height="250px" title="sim1" alt="sim1"></img>
-<img src="./images/sim2.jpg" width="250px" height="250px" title="sim2" alt="sim2"></img>
-<img src="./images/sim3.jpg" width="250px" height="250px" title="sim3" alt="sim3"></img><br/>
+<br><img src="./images/sim1.PNG" width="250px" height="250px" title="sim1" alt="sim1"></img>
+<img src="./images/sim2.PNG" width="250px" height="250px" title="sim2" alt="sim2"></img>
+<img src="./images/sim3.PNG" width="250px" height="250px" title="sim3" alt="sim3"></img><br/>
 
 ### Similar tradeamark searching service
 As an application of this repository, we made a Similar trademark seraching service.
