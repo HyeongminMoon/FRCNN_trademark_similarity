@@ -15,6 +15,8 @@ We tried to contain the all feature but some are removed due to accuracy.
 
 For example, the trademarks' viennacodes distribution is not flat because many trademark contain a Creature
 
+<img src="./images/dist.jpg" width="750px" height="250px" title="dist" alt="dist"></img>
+
 <br><img src="./images/det1.jpg" width="250px" height="250px" title="det1" alt="det1"></img>
 <img src="./images/det2.jpg" width="250px" height="250px" title="det2" alt="det2"></img>
 <img src="./images/det3.jpg" width="250px" height="250px" title="det3" alt="det3"></img><br/>
