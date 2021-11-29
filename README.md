@@ -40,3 +40,4 @@ As an application of this repository, we made a Similar trademark seraching serv
 ![image](https://user-images.githubusercontent.com/32811724/142619604-3c5aeaad-fa1d-4b18-b169-804314554c2e.png)
 
 
+.
