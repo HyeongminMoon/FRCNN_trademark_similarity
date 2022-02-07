@@ -66,3 +66,17 @@
         <A href = "https://doi.org/10.8080/1020200181271">Patent METHOD OF SEARCHING TRADEMARKS AND APPARATUS FOR SEARCHING TRADEMARKS</A>
     </div>
 </div>
+
+<div class="row g-5 mb-5" style="text-align:left">
+<hr width = "90%" color = "black">
+<h5> Project Links </h5>
+      {% for item in site.data.publications.featured %}
+        <p><a href="{{ item.url }}">{{ item.name }}</a></p>
+      {% endfor %}
+    {% else %}
+      includes publications.html
+      {% for item in site.data.publications.index %}
+        <p><a href="{{ item.url }}">{{ item.name }}</a></p>
+      {% endfor %}
+    {% endif %}
+</div>
