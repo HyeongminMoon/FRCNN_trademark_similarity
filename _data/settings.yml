@@ -1,5 +1,5 @@
 menu:
-- {name: 'Home', url: 'https://hyeongminmoon.github.io/'}
+- {name: 'Home', link: 'https://hyeongminmoon.github.io/'}
 - {name: 'CV', url: '/cv'}
 - {name: 'Contact', url: '/contact'}
 
