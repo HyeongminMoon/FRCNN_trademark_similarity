@@ -12,240 +12,17 @@
     <h3 class="fw-bold border-bottom pb-3 mb-5">Main Projects</h3>
     {% if page.title == "Home" %}
       
-    <div class="row g-5 mb-5">
-      <div class="col-md-6"> 
-        <h5>요약</h5>
-        <p>2020.06 유사 상표 이미지 검색 시스템</p>
-        <p>- 예비창업패키지 최우수상 수상</p>
-        <p>- 상표 검색 관련 특허 발명자 등록</p>
-        <p>2021.03 한자 분류, 필체 예측</p>
-        <p>- 창의융합설계 데모데이 우수상 수상</p>
-        <p>2021.09 모델 경량화, 엣지 컴퓨팅</p>
-        <p>2021.09 음성 인식, 무음 구간 제거</p>
-        <p>2021.10 이미지 세그멘테이션, 이미지 스케칭, 이미지 생성(GAN)</p>
-        <p>2021.11 멀티GPU, 분산 컴퓨팅 학습</p>
-        <p>2021.12 빌딩 세그멘테이션</p>
-        <p>2021.12 자율주행</p>
-        <p>2021.12 헬멧, 장갑 착용여부 예측</p>
-        <p>2021.12 비전 인공지능 교육 활동 시작</p>
-        <p>2022.01 간, 종양 세그멘테이션</p>
-        <p>2022.01 폴리곤 예측-기울어진 직사각형</p>
-        <p>2022.02 이미지 스티칭(파노라마 기술)</p>
-      </div>
-      <div class="col-md-6">
-        <h5> Keywords & Summary </h5>
-        <p>2020.06 Trademark Similarity</p>
-        <p>- Patent inventor registration</p>
-        <p>2021.03  AI Chinese Calligraphy Teacher</p>
-        <p>2021.09 Model Quantization, Edge Computing</p>
-        <p>2021.09 Voice Activity Detection</p>
-        <p>2021.10 Segmentation, Sketching, Image Generate(GAN)</p>
-        <p>2021.11 Multi GPU, Distributed Computing</p>
-        <p>2021.12 Building Segmentation</p>
-        <p>2021.12 Self-Driving</p>
-        <p>2021.12 Helmet, Glove Detection</p>
-        <p>2021.12 Vision AI Education Activity</p>
-        <p>2022.01 Liver, Tumor Segmentation</p>
-        <p>2022.01 Polygon Detection</p>
-        <p>2022.02 Image Stitching</p>
-      </div>
-    </div>
-      <h4 class="b" id="u2net_portrait_sketch"><A href = "https://github.com/HyeongminMoon/U-2-Net_portrait_sketch">(2021) Portrait sketch by improving segmentation model</A></h4>
   </div>
 </div>
 
-<div class="row g-5 mb-5">
-  <div class="col-md-6"> 
-      <br></br>
-      <br></br>
-      <h5> High-detailed Segmentation becomes Portrait sketch </h5>
-      <p> - The U-2Net is famous for segmetation model.</p>
-      <p> - It's model has a complex structure so it does segmetnation to the level that presents a strand of hair.</p>
-      <h5> Enhancing to become portrait model </h5>
-      <p> - Based on this high quality, people thought that it is possible to use this model for portrait sketch but at first it had not good performance. </p>
-      <p> - I tried various trying to enhance this model such as preprocessing images, devising a dedicated augmentation techniques. </p>
-      <p> - If you want to get information about U2Net, please refer <a href="https://github.com/xuebinqin/U-2-Net">this original repository</a> <p>
-  </div>
-  <div class="col-md-6">
-    
-<p><br><img src="https://user-images.githubusercontent.com/32811724/143386093-f9f3b1e0-4e8b-4fcd-9303-56a872888f5d.png" width="45%"></img>
-<img src="https://user-images.githubusercontent.com/32811724/143386103-8eb3fb3b-8bed-4f37-8a49-3b4ef1718fe4.png" width="45%"></img>
-</br>
-<br><img src="https://user-images.githubusercontent.com/32811724/143386178-d2eeb72e-2a33-43c8-b0f8-713efbf30709.png" width="45%"></img>
-<img src="https://user-images.githubusercontent.com/32811724/143386194-614bfe30-e025-47b7-a899-43839344c172.png" width="45%"></img>
-</br>
-<br><img src="https://user-images.githubusercontent.com/32811724/143386187-71006f1b-9e29-4158-b01b-f4541ad057f4.png" width="45%"></img>
-<img src="https://user-images.githubusercontent.com/32811724/143386196-e7215ff1-7b2c-4e9c-8554-4bd8c94fc3ff.png" width="45%"></img>
-</br></p>
-  </div>
-</div>
-
-<div class="row g-5 mb-5">
-  <div class="col-md-6">
-<p><img src="https://user-images.githubusercontent.com/32811724/143388489-1d9e0756-58e9-4ab6-98f9-ca0f0c044869.gif" alt="IU_Coin_train_custom_erode2 (1)" width="90%">
-<img src="https://user-images.githubusercontent.com/32811724/143388497-3237d2db-3b80-4309-97f3-a4d7aae28321.gif" alt="Traffic_light_custom_b2" width="90%"></p>
-  </div>    
-  <div class="col-md-6">
-      <br></br>
-      <br></br>
-      <h5> Video demo & TODO </h5>
-      <p> - It has been confirmed that we can produce videos of a different style from conventional common black-and-white or sketch transformations.</p>
-      <p> - The above one is similar to common sketch transformation but below one bring us new style, with removed dirty information.</p>
-      <p> - However, additional work seems to be needed to apply the video, such as the contrast of the screen changing naturally.</p>
-      <h5 id="other-things">More</h5>
-      <p> - If you want to see the enhancing processes, plese refer this repository </p>
-      <p> - <A href = "https://github.com/HyeongminMoon/U-2-Net_portrait_sketch">(2021) Portrait sketch by improving segmentation model</A> </p>
-  </div>
-</div>
+<h4 class="b" id="u2net_portrait_sketch"><A href = "https://github.com/HyeongminMoon/U-2-Net_portrait_sketch">(2021) Portrait sketch by improving segmentation model</A></h
     
 
-<h4 class="b" id="edge computing">(2021) Edge computing without CUDA, with quantization & tensorflow js</h4>
-
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/deeplab"></script>
-
-<div class="row g-5 mb-5">
-    <div class="col-md-6">
-        
-        <img id="img" src="https://user-images.githubusercontent.com/32811724/147175762-2749386f-3c38-4a8a-89a5-80928e00e381.jpg" alt="" width="90%"/>
-        <input type="button" id="button1" onclick="predict();" value="demo"/>
-        <form method="post" enctype="multipart/form-data">
-        <input type="file" id="button2" onchange="changeimg(this);" accpet="image/*" value="upload image"/>
-        </form>
-    </div>
-    <div class="col-md-6">
-        <canvas id="person">
-        </canvas>
-    </div>
-</div>
-<h5> This is how to use GPU without environment setting </h5>
-<p> - It is widely known that the operation speed is much faster if the deeplearning operations calculated in the gpu rather than cpu.</p>
-<p> - To use GPU we need CUDA/CuDNN setting but clients don't know how to install those and don't need to know.</p>
-<p> - In this situation, there is a good solution that use GPU without CUDA, is graphical backend such as WebGL. </p>
-<p> - Now what we all need is preparing custom model, being lighten(using quantization) model, load model!</p>
-<p> - Above demo don't need server side operation, it uses your computer resource, CPU and GPU. (So you can feel your computer get lag when you start demo)</p>
-<p> - Unfortunately, there is a chache problem with processing the gpu now, so if your gpu capacity is small, it can be shutdown when executing the demo. So now, it is only allowed to work with cpu.
-    
-<script>
-function changeimg(input) {
-    var file = input.files[0];
-    document.getElementById("img").src = URL.createObjectURL(file);
-    predict();
-}
-    
-const loadModel = async () => {
-  const modelName = 'ade20k';   // set to your preferred model, either `pascal`, `cityscapes` or `ade20k`
-  const quantizationBytes = 2;  // either 1, 2 or 4
-  return await deeplab.load({base: modelName, quantizationBytes});
-};
-    
-const translateSegmentationMap = async (segmentationMap) => {
-  return await deeplab.toSegmentationImage(
-      deeplab.getColormap(model), deeplab.getLabels(model), segmentationMap)
-};
-
-const img = document.getElementById('img');
-// var pixels = tf.browser.fromPixels(img);
-// pixels = tf.image.resizeBilinear(pixels, [227, 500]);//227, 500, 3
-// console.log(pixels)
-// const input = tf.zeros([227, 500, 3]);
-// ...
-var canvas = document.getElementById('person');
-canvas.style.width = '90%';
-ctx = canvas.getContext('2d');
-const demo_clear_img = new Image();
-demo_clear_img.src = "/assets/img/demo_clear.jpg";
-demo_clear_img.onload = function(){
-    ctx.drawImage(demo_clear_img, 0, 0)
-}
-    
-const predict = async () => {
-    
-    const model = await loadModel();
-
-    const output = await model.segment(img).then((output) =>{
-//         console.timeEnd("predict time");
-        const {legend, height, width, segmentationMap} = output
-//         console.log(`The predicted classes are ${JSON.stringify(legend)}`);
-        //             console.log(segmentationMap);
-        var canvas = document.getElementById('person');
-            canvas.style.width = '90%';
-        canvas.width = width;
-        canvas.height = height;
-//         console.log(width, height)
-        ctx = canvas.getContext('2d');
-        var imgdata = new ImageData(segmentationMap, width, height);
-        ctx.putImageData(imgdata, 0, 0);
-    });
-
-};
 
 
-// predict();
-</script>
-
-<h4 class="b" id="chinese">(2021) AI Chinese Calligraphy Teacher (인공훈장)</h4>    
-<div class="row g-5 mb-5">
-    <div class="col-md-6">
-        <br> </br>
-        <h5> Introduction </h5>
-        <p> - This is a project that reveals my development philosophy. </p>
-        <p> - Before starting this project, we didnt consider how to develop a program, we considered <b>how to solve a problem</b>. </p>
-        <p> - So we met calligrapher several times, and asked what he need from the perspective of <b>teaching/learning calligraphy</b></p>
-        <p> - Calligraphy has both artistic and academic meanings. </p>
-        <p> - In fact, when evaluating calligraphy in a calligraphy contest, it is included that an evaluation of which typeface was reproduced in the past. </p>
-    </div>
-    <div class="col-md-6">
-        meet professor image
-        <img src="https://user-images.githubusercontent.com/32811724/147175911-a20f1c23-6dbc-457c-978a-feafa7071c44.jpg" width="90%"></img>
-        <div style="text-align:center"> Various style of Calligraphy </div>
-    </div>
-</div>
-<div class="row g-5 mb-5">
-    <div class="col-md-6">
-        <img src="https://user-images.githubusercontent.com/32811724/147175816-bca1fd7a-4d96-44d6-ba9c-f234ee27510c.jpg" width="90%"></img>
-    </div>
-    <div class="col-md-6">
-        <h5> Model Separation </h5>
-        <p> - We sparated models by appearance model that predict what is the character is, and semantic model that evaluate how much the character resembled to the old challigrapher's characters </p>
-        <br> </br>
-        <h5> Data Collection </h5>
-        <p> - CharactersTrimPad28: 15,000,000 of character dataset, used for training appearance model</p>
-        <p> - Kaggle Chinese Calligraphy styles by Calligraphers: a dataset with handwritings of 20 famous old challigraphers, used for training semantic model</p>
-    </div>
-</div>
-<div class="row g-5 mb-5">
-    <div class="col-md-6">
-        <h5> Training Models </h5>
-        <p> - By above datasets, we trained two models based on CNN </p>
-        <br> </br>
-        <h5> Results </h5>
-        <p> Appearance model - Precision 98.9%, F1 score 98.4%</p>
-        <p> Semantic model - Precision 98.5%, F1 score 99.0%</p>
-        <br> </br>
-        <h5> Presentation video </h5>
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/v7sp5i0UEQI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-    </div>
-    <div class="col-md-6">
-        <img src="https://user-images.githubusercontent.com/32811724/147175817-221effa6-9729-4c47-a386-50c2fba399fa.jpg" width="90%"></img>
-        <img src="https://user-images.githubusercontent.com/32811724/147175818-a14b4694-d217-41e1-a2ab-de2788f68a64.jpg" width="90%"></img>
-    </div>
-</div>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 <h4 class="b" id="frcnn"><A href = "https://github.com/HyeongminMoon/FRCNN_trademark_similarity">(2020) Rank search by image similarity and multi label classification </A></h4>
 
-
+<div class="row g-5 mb-5">
 <h5> Multi label classification </h5>
 <p> - One of the difficult trademark's feature is figurative. It could be expressed like "the heart shaping cat", "the S shaping chicken", 
     etc. </p>
@@ -253,6 +30,7 @@ const predict = async () => {
 <p> - So we need to make new classification table based on ViennaCodes.</p>
 <p> - We tried to contain the all feature but some are removed due to accuracy. </p>
 <p> - For example, the trademarks' viennacodes distribution is not flat because many trademark contain a Creature.</p>
+</div>
 <div style="text-align:left">
 <h6> result samples </h6>
 <p><br><img src="https://user-images.githubusercontent.com/32811724/147175829-eca9976a-840c-4c90-be47-417d95fb9dcc.jpg" width="20%" title="det1" alt="det1"></img>
@@ -294,18 +72,4 @@ const predict = async () => {
         <h5> Patent </h5>
         <A href = "https://doi.org/10.8080/1020200181271">Patent METHOD OF SEARCHING TRADEMARKS AND APPARATUS FOR SEARCHING TRADEMARKS</A>
     </div>
-</div>
-
-<div class="row g-5 mb-5" style="text-align:left">
-<hr width = "90%" color = "black">
-<h5> Project Links </h5>
-      {% for item in site.data.publications.featured %}
-        <p><a href="{{ item.url }}">{{ item.name }}</a></p>
-      {% endfor %}
-    {% else %}
-      includes publications.html
-      {% for item in site.data.publications.index %}
-        <p><a href="{{ item.url }}">{{ item.name }}</a></p>
-      {% endfor %}
-    {% endif %}
 </div>
