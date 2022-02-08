@@ -22,6 +22,7 @@
     무슨 자신감으로 이력서를 냈는지, 역시 근거없는 자신감 빼면 시체인 과거의 나답다.</p>
 <p class="jm-font"> - 운이 좋게도 당시 대표님의 마음에 들었는지 인턴 3개월 기간 이후에 정식 입사제의, 그것도 PM급 제의를 받게되었다. 아무것도 모르던 새파란 인턴부터 특허 출원에 과분한 팀장까지... 인공지능이란
     친구와 우연에서 인연이 된 계기가 된 뜻 깊은 프로젝트이기도 하다.</p>
+<br></br>
 
 <h5 class="jm-font"> 학습 데이터 수집 & 멀티 레이블 분류 </h5>
 <p class="jm-font"> - 상표 이미지의 독특한 특징은 비유적인 표현이 들어가 있다는 것이다. 예를들어 하트 모양으로 누워있는 고양이라던지 다양한 비유적인 표현을 수치화 시킬 필요가 있었다.</p>
@@ -33,17 +34,20 @@
     최대한 학습했다. 이후에 2021년에 AI hub에 학습 데이터 수집 사업이 완료되면 270만개 모두에 해당하는 라벨링 된 특허 상표 이미지가 업로드 된다고 하니 MVP를 만들 정도로만 작게 잡았다.</p>
 <p class="jm-font"> - FRCNN 모델을 이용하여 멀티 레이블 분류 모델을 학습했다. Pytorch의 CocoDataset으로 사전학습 된 Backbone을 사용했다.</p>
 <div style="text-align:left">
-<h6 class="jm-font"> 결과 예시들 </h6>
+<br></br>
+<h5 class="jm-font"> 결과 예시들 </h5>
 <p class="jm-font"><br><img src="https://user-images.githubusercontent.com/32811724/147175829-eca9976a-840c-4c90-be47-417d95fb9dcc.jpg" width="20%" title="det1" alt="det1"></img>
 <img src="https://user-images.githubusercontent.com/32811724/147175831-64ffea5f-4f69-4348-bbea-3eea60051e3f.jpg" width="20%" title="det2" alt="det2"></img>
 <img src="https://user-images.githubusercontent.com/32811724/147175832-6a53944e-3605-420e-8e9b-3692a3a6fa86.jpg" width="20%" title="det3" alt="det3"></img><br/></p>
 </div>
 
+<br></br>
 
 <h5 class="jm-font"> Triplet </h5>
 <p class="jm-font"> - 다음으로는 포괄적인 이미지 자체의 특징 벡터를 추출하기 위한 모델을 설계했다. 모델은 efficientnet-b0을 이용했으며, 위에서 분류한 242분류를 기반으로 triplet 형식의 데이터 셋을
       만들어 학습하였다. Triplet이란 Input 이미지에 대해 유사한 이미지와 유사하지 않은 이미지, 총 3개로 이루어진 이미지 쌍을 말한다. Triplet loss를 이용하면 유사한 이미지와 그렇지
       않은 이미지 사이에 결과 벡터를 명확하게 구분되게끔 학습 할 수 있다.</p>
+<br></br>
 
 <h5 class="jm-font"> 코사인 유사도 </h5>
 <p class="jm-font"> - 그렇게 학습된 모델에서 마지막 레이어의 완전결합층(Fully connected vector)의 벡터의 거리를 계산하여 이미지 유사도를 구하게 된다. 이때 벡터의 거리를 계산하는 방법은 유클리드 거리,
@@ -51,6 +55,7 @@
       분류표에서 비슷한 분류를 가깝게 위치하게 한다면 완전결합층에서도 비슷한 분류는 가까운 차원에 위치할 것이고, 이는 코사인 유사도 계산의 효과를 극대화 할 수 있기 때문이다.</p>
 <p class="jm-font"> - 예를 들어 분류중에는 남자 아이와 여자 어른이 있다. 이 둘을 완전히 다른 분류라고 인식하면 문제가 있을 것이다. 따라서 이 두 분류를 가깝게 위치하면 코사인 벡터의 화살표가
       살짝 틀어져도 어느정도 유사성이 있다고 볼 수 있다.</p>
+<br></br>
 
 <h5 class="jm-font"> 이미지 유사도 </h5>
 <p class="jm-font"> - 위의 두가지 모델에서 계산한 코사인 유사도를 곱해 최종 유사도를 계산한다. </p>
