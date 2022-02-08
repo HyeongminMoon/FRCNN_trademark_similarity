@@ -33,26 +33,28 @@
 <img src="https://user-images.githubusercontent.com/32811724/147175832-6a53944e-3605-420e-8e9b-3692a3a6fa86.jpg" width="20%" title="det3" alt="det3"></img><br/></p>
 </div>
 
-<div class="row g-5 mb-5" style="text-align:left">
-    <div class="col-md-6">
-        <br> </br>
-        <h5> Cosine Similarity </h5>
-        <p> - We transfer learned pretrained model efficientnet-b0 with triplet loss. </p>
-        <p> - To attach triplet loss, we made triple pair dataset by above ViennaCode based trademark classification rules, 
-            select two **Similar** images which has same label and one **Different** images which is selected randomly </p>
-        <p> - And we calculated the Cosine Similarity from it's final fully connected vectors.</p>
 
-        <h5> Image Similarity </h5>
-        <p> - And again we mixed the results with above multi label classification score. </p>
-        <p> - Finally we got final Image Similarity score </p>
-    </div>
-    <div class="col-md-6">
-        <br><img src="https://user-images.githubusercontent.com/32811724/147176073-92a8454d-9985-444d-b262-f7dfd4e51bd1.png" width="49%"></img>
-        <img src="https://user-images.githubusercontent.com/32811724/147176079-8fce7cc7-5017-4ead-9c3b-649fd01e1a67.png" width="49%"></img></br>
-        <br><img src="https://user-images.githubusercontent.com/32811724/147176080-073d99c5-0941-4394-bc08-d59c4fd16fd1.png" width="49%"></img>
-        <img src="https://user-images.githubusercontent.com/32811724/142619840-5c51e3bb-9ec6-44ee-a3bc-63b35ebf0211.png" width="49%"></img></br>
-    </div>
-</div>
+<h5> Triplet </h5>
+<p> - 다음으로는 포괄적인 이미지 자체의 특징 벡터를 추출하기 위한 모델을 설계했다. 모델은 efficientnet-b0을 이용했으며, 위에서 분류한 242분류를 기반으로 triplet 형식의 데이터 셋을
+      만들어 학습하였다. Triplet이란 Input 이미지에 대해 유사한 이미지와 유사하지 않은 이미지, 총 3개로 이루어진 이미지 쌍을 말한다. Triplet loss를 이용하면 유사한 이미지와 그렇지
+      않은 이미지 사이에 결과 벡터를 명확하게 구분되게끔 학습 할 수 있다.</p>
+
+<h5> 코사인 유사도 </h5>
+<p> - 그렇게 학습된 모델에서 마지막 레이어의 완전결합층(Fully connected vector)의 벡터의 거리를 계산하여 이미지 유사도를 구하게 된다. 이때 벡터의 거리를 계산하는 방법은 유클리드 거리,
+      L1 norm, L2 norm, 코사인 유사도 등 정말 다양하게 있다. 우리는 이미 분류표를 작성하는 단계에서 이를 고민하여 코사인 유사도를 사용하기로 했다. 
+      분류표에서 비슷한 분류를 가깝게 위치하게 한다면 완전결합층에서도 비슷한 분류는 가까운 차원에 위치할 것이고, 이는 코사인 유사도 계산의 효과를 극대화 할 수 있기 때문이다.</p>
+<p> - 예를 들어 분류중에는 남자 아이와 여자 어른이 있다. 이 둘을 완전히 다른 분류라고 인식하면 문제가 있을 것이다. 따라서 이 두 분류를 가깝게 위치하면 코사인 벡터의 화살표가
+      살짝 틀어져도 어느정도 유사성이 있다고 볼 수 있다.</p>
+
+<h5> 이미지 유사도 </h5>
+<p> - 위의 두가지 모델에서 계산한 코사인 유사도를 곱해 최종 유사도를 계산한다. </p>
+<p> - 아래는 이 최종 유사도를 통해 검색한 유사도 순위 결과이다. 기존에 상용하는 유사 상표 검색 서비스들보다 월등하다.</p>
+
+<br><img src="https://user-images.githubusercontent.com/32811724/147176073-92a8454d-9985-444d-b262-f7dfd4e51bd1.png" width="49%"></img>
+<img src="https://user-images.githubusercontent.com/32811724/147176079-8fce7cc7-5017-4ead-9c3b-649fd01e1a67.png" width="49%"></img></br>
+<br><img src="https://user-images.githubusercontent.com/32811724/147176080-073d99c5-0941-4394-bc08-d59c4fd16fd1.png" width="49%"></img>
+<img src="https://user-images.githubusercontent.com/32811724/142619840-5c51e3bb-9ec6-44ee-a3bc-63b35ebf0211.png" width="49%"></img></br>
+
 
 <div class="row g-5 mb-5">
     <div class="col-md-6">
