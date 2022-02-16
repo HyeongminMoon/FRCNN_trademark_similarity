@@ -1,7 +1,7 @@
 menu:
 - {name: 'Home', url: 'https://hyeongminmoon.github.io'}
-- {name: 'CV', url: '/cv'}
-- {name: 'Contact', url: '/contact'}
+- {name: 'CV', url: 'https://hyeongminmoon.github.io/cv'}
+- {name: 'Contact', url: 'https://hyeongminmoon.github.io/contact'}
 
 social:
 - {icon: 'github', link: 'https://github.com/HyeongminMoon'}
