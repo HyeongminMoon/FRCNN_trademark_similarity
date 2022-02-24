@@ -15,7 +15,7 @@
 
 {% if page.title == "Home" %}
 
-<h5 class="jm-font"> 머리말 </h5>
+<h5 class="jm-font"> <b>머리말</b> </h5>
 <p class="jm-font"> - 펜데믹 상황으로 우연히 연구실 방학기간을 가지게 되면서 반 강제적으로 집에서 쉬게 되었다. 
     뭔가 인생 처음으로 정말 말그대로 아무것도 안하게 되어서 처음엔 마음껏 하고 싶었던 게임이나, 노래 등 취미생활을 만끽했는데, 진로를 진지하게 고민하게 된 시기이기도 했다.
     폐인생활에 한창 찌들어 있을 때, 뭐라도 하자는 마음으로 새로 시작하는 스타트업에 초기 개발자로 인턴생활을 시작하게 되었다. 이때 나는 인공지능이라고는 학교에서 잠깐 건드려본 인공지능 개론이 전부였는데
@@ -24,7 +24,7 @@
     친구와 우연에서 인연이 된 계기가 된 뜻 깊은 프로젝트이기도 하다.</p>
 <br></br>
 
-<h5 class="jm-font"> 학습 데이터 수집 & 멀티 레이블 분류 </h5>
+<h5 class="jm-font"> <b>학습 데이터 수집 & 멀티 레이블 분류</b> </h5>
 <p class="jm-font"> - 상표 이미지의 독특한 특징은 비유적인 표현이 들어가 있다는 것이다. 예를들어 하트 모양으로 누워있는 고양이라던지 다양한 비유적인 표현을 수치화 시킬 필요가 있었다.</p>
 <p class="jm-font"> - 이러한 특징을 분류하기 위해 국제적으로 비엔나 코드라는 분류체계가 있지만 사람, 동물 등의 자주 사용되는 객체와 세이렌(스타벅스에 사용된 그리스 신화의 한 신)같이 거의 사용되지 않는 객체의
 사용 빈도가 크게 고려되지 않은 느낌이었다.</p>
@@ -35,7 +35,7 @@
 <p class="jm-font"> - FRCNN 모델을 이용하여 멀티 레이블 분류 모델을 학습했다. Pytorch의 CocoDataset으로 사전학습 된 Backbone을 사용했다.</p>
 <div style="text-align:left">
 <br></br>
-<h5 class="jm-font"> 결과 예시들 </h5>
+<h5 class="jm-font"> <b>결과 예시들</b> </h5>
 <p class="jm-font"><br><img src="https://user-images.githubusercontent.com/32811724/147175829-eca9976a-840c-4c90-be47-417d95fb9dcc.jpg" width="20%" title="det1" alt="det1"></img>
 <img src="https://user-images.githubusercontent.com/32811724/147175831-64ffea5f-4f69-4348-bbea-3eea60051e3f.jpg" width="20%" title="det2" alt="det2"></img>
 <img src="https://user-images.githubusercontent.com/32811724/147175832-6a53944e-3605-420e-8e9b-3692a3a6fa86.jpg" width="20%" title="det3" alt="det3"></img><br/></p>
@@ -43,13 +43,13 @@
 
 <br></br>
 
-<h5 class="jm-font"> Triplet </h5>
+<h5 class="jm-font"> <b>Triplet</b> </h5>
 <p class="jm-font"> - 다음으로는 포괄적인 이미지 자체의 특징 벡터를 추출하기 위한 모델을 설계했다. 모델은 efficientnet-b0을 이용했으며, 위에서 분류한 242분류를 기반으로 triplet 형식의 데이터 셋을
       만들어 학습하였다. Triplet이란 Input 이미지에 대해 유사한 이미지와 유사하지 않은 이미지, 총 3개로 이루어진 이미지 쌍을 말한다. Triplet loss를 이용하면 유사한 이미지와 그렇지
       않은 이미지 사이에 결과 벡터를 명확하게 구분되게끔 학습 할 수 있다.</p>
 <br></br>
 
-<h5 class="jm-font"> 코사인 유사도 </h5>
+<h5 class="jm-font"> <b>코사인 유사도</b> </h5>
 <p class="jm-font"> - 그렇게 학습된 모델에서 마지막 레이어의 완전결합층(Fully connected vector)의 벡터의 거리를 계산하여 이미지 유사도를 구하게 된다. 이때 벡터의 거리를 계산하는 방법은 유클리드 거리,
       L1 norm, L2 norm, 코사인 유사도 등 정말 다양하게 있다. 우리는 이미 분류표를 작성하는 단계에서 이를 고민하여 코사인 유사도를 사용하기로 했다. 
       분류표에서 비슷한 분류를 가깝게 위치하게 한다면 완전결합층에서도 비슷한 분류는 가까운 차원에 위치할 것이고, 이는 코사인 유사도 계산의 효과를 극대화 할 수 있기 때문이다.</p>
@@ -57,7 +57,7 @@
       살짝 틀어져도 어느정도 유사성이 있다고 볼 수 있다.</p>
 <br></br>
 
-<h5 class="jm-font"> 이미지 유사도 </h5>
+<h5 class="jm-font"> <b>이미지 유사도</b> </h5>
 <p class="jm-font"> - 위의 두가지 모델에서 계산한 코사인 유사도를 곱해 최종 유사도를 계산한다. </p>
 <p class="jm-font"> - 아래는 이 최종 유사도를 통해 검색한 유사도 순위 결과이다. 기존에 상용하는 유사 상표 검색 서비스들보다 월등하다.</p>
 
@@ -67,13 +67,13 @@
 <img src="https://user-images.githubusercontent.com/32811724/142619840-5c51e3bb-9ec6-44ee-a3bc-63b35ebf0211.png" width="49%"></img></br>
 
 <br> </br>
-<h5 class="jm-font"> 서비스 </h5>
+<h5 class="jm-font"> <b>서비스</b> </h5>
 <p class="jm-font"> 아래는 위의 모델들로 만들어진 간단한 웹 MVP이다. 백엔드는 Django, 프론트엔드는 React, 데이터 베이스는 MySQL, Redis를 사용하였다. </p>
 <img src="https://user-images.githubusercontent.com/32811724/142619590-b5fa63a2-6b15-4720-9d99-cbd15fddc3c7.png" width="45%">
 <img src="https://user-images.githubusercontent.com/32811724/142619604-3c5aeaad-fa1d-4b18-b169-804314554c2e.png" width="45%">
 
 <br> </br>
-<h5 class="jm-font"> 특허출원 </h5>
+<h5 class="jm-font"> <b>특허출원</b> </h5>
 <p class="jm-font"> 관련해서 특허를 출원에 성공했다. </p>
 <a style="color:blue" href = "https://doi.org/10.8080/1020200181271" style="color:blue">Patent METHOD OF SEARCHING TRADEMARKS AND APPARATUS FOR SEARCHING TRADEMARKS</a>
 
