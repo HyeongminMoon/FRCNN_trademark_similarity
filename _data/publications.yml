@@ -1,4 +1,7 @@
 featured:
+- {name: '유사이미지 검색: CNN을 이용한 이미지 유사도 측정 및 검색시스템', url: 'https://hyeongminmoon.github.io/FRCNN_trademark_similarity/'}
 - {name: '인공훈장: 인공지능을 활용한 서체 분류 및 한자 인식 어플리케이션', url: 'https://hyeongminmoon.github.io/FRCNN_Calligraphy/'}
 - {name: '엣지 컴퓨팅: tfjs(tensorflow on javascript)를 이용한 웹GL기반 AI 어플리케이션 띄우기', url: 'https://hyeongminmoon.github.io/tfjs_Edge-computing-by-inference-AImodel-on-WebGL/'}
 - {name: '딥러닝 스케치: CNN Segmentation모델을 활용한 스케치모델', url: 'https://hyeongminmoon.github.io/U-2-Net_portrait_sketch/'}
+- {name: '폴리곤 예측: 기울어진 직사각형 예측 및 트래킹', url: 'https://hyeongminmoon.github.io/PolygonObjectDetection/'}
+- {name: '이미지 스티칭: Opencv를 활용한 커스텀 이미지 스티칭', url: 'https://hyeongminmoon.github.io/Image_Stitching/'}
